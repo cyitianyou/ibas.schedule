@@ -1,0 +1,36 @@
+{
+    "name": "ibas.schedule",
+    "version": "1.0.0",
+    "description": "ibas定时任务,定时执行集成任务",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "ts-node --inspect ./src/app.ts",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "ibas",
+        "typescript",
+        "koa2",
+        "node-schedule"
+    ],
+    "author": "cyitianyou",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "jquery": "^3.2.1",
+        "koa": "^2.5.3",
+        "koa-bodyparser": "^4.2.1",
+        "koa-logger": "^3.2.0",
+        "koa-router": "^7.4.0",
+        "log4js": "^3.0.5",
+        "window": "^4.2.5"
+    },
+    "devDependencies": {
+        "@types/koa": "^2.0.46",
+        "@types/koa-bodyparser": "^5.0.1",
+        "@types/koa-logger": "^3.1.0",
+        "@types/node": "^10.11.0",
+        "ts-node": "^7.0.1",
+        "typescript": "^3.0.3"
+    }
+}

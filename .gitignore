@@ -1,0 +1,33 @@
+# files & folder
+*.js
+*.map
+*.bat
+*.sh
+*.tmp
+*.publishproj
+*.sln
+*.log
+*_log_*.txt
+.project
+*.d.ts
+/.vs/
+/.vscode/
+/.metadata/
+/.recommenders/
+/.settings/
+/RemoteSystemsTempFiles/
+/Servers/
+/tomcat/
+/others/
+/upload/
+/release/
+/target/
+/out/
+/test/apps/
+/node_modules/
+
+
+# exceptions
+!ibas/3rdparty/*.js
+!openui5/types/*.ts
+!test/apps/trainingtesting/
