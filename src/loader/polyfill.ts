@@ -8,9 +8,12 @@
 // 胶水代码,补充node环境下window缺失的问题
 const windowClass: any = require("window");
 // window
-(<any>global).window = new windowClass();
+(<any>global).window = new windowClass({ url: "https://app.avacloud.com.cn/t4v6wfh1/p02/" });
 // document
 (<any>global).document = (<any>global).window.document;
+// require
+let requirejs: any = require("../3rdparty/r");
+(<any>global).window.require = requirejs;
 // jQuery
 const $: any = require("jQuery");
 (<any>global).$ = (<any>global).jQuery = $;

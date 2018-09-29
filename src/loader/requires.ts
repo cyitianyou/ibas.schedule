@@ -14,32 +14,19 @@ export function create(name: string, baseUrl: string, noCache: boolean): Functio
 /** 创建require方法 */
 export function create(): Function {
     let name: string = arguments[0], baseUrl: string = arguments[1], noCache: boolean = arguments[2];
-    let requirejs: Require = require("../3rdparty/r");
-    let httpRequire: any;
     if (noCache) {
         // 不使用缓存
-        httpRequire = (<any>requirejs.config)({
+        return (<any>window).require.config({
             context: name,
             baseUrl: baseUrl,
-            nodeRequire: require,
             urlArgs: function (id: string, url: string): string {
                 return (url.indexOf("?") === -1 ? "?" : "&") + "_=" + runtime;
             }
         });
     } else {
-        httpRequire = (<any>requirejs.config)({
+        return (<any>window).require.config({
             context: name,
-            baseUrl: baseUrl,
-            nodeRequire: require
+            baseUrl: baseUrl
         });
     }
-    return function (deps: Array<string>, callback?: Function, errback?: Function, optional?: any): any {
-        if (!(deps instanceof Array)) {
-            deps = [deps];
-        }
-        let newDeps: Array<string> = new Array();
-        for (let dep of deps) {
-            let url: string = httpRequire.toUrl(dep);
-        }
-    };
 }

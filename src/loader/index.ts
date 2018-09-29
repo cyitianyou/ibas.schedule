@@ -11,17 +11,15 @@ let requires: any = require("./requires");
 // 最小库标记
 export const SIGN_MIN_LIBRARY: string = ".min";
 // ibas index路径
-export const URL_IBAS_INDEX: string = "index";
+export const URL_IBAS_INDEX: string = "ibas/index";
 /** 应用程序 */
-export class Application {
+module.exports = class Application {
     // index路径
     static URL_INDEX: string = "index";
     /** 根地址 */
     root: string;
     /** ibas 根地址 */
     ibasRoot: string;
-    /** openui5 根地址 */
-    openui5Root: string;
     /** 不使用缓存 */
     noCache: boolean;
     /** 使用最小库 */
@@ -57,4 +55,4 @@ export class Application {
     private diagnose(): void {
         //
     }
-}
+};

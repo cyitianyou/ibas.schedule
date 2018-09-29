@@ -2543,7 +2543,12 @@ var requirejs, require, define, xpcUtil;
             //Add wrapper around the code so that it gets the requirejs
             //API instead of the Node API, and it is done lexically so
             //that it survives later execution.
-            req.makeNodeWrapper = function(contents, moduleName) {
+            req.makeNodeWrapper = function(contents) {
+                return '(function (require, requirejs, define) { ' +
+                    contents +
+                    '\n}(requirejsVars.require, requirejsVars.requirejs, requirejsVars.define));';
+            };
+            req.makeNodeWrapperForHttp = function(contents, moduleName) {
                 return '(function (require, requirejs, define) { ' +
                     contents +
                     "\nglobal." + moduleName + "=" + moduleName + ";\n" +
@@ -2559,7 +2564,7 @@ var requirejs, require, define, xpcUtil;
                         'for module: ' + moduleName);
                 }
                 if (url.startsWith("http")) {
-                    let JQryAjxSetting = {
+                    let JQueryAjaxSetting = {
                         url: url,
                         type: "GET",
                         contentType: "text/html; charset=utf-8",
@@ -2569,13 +2574,17 @@ var requirejs, require, define, xpcUtil;
                             return context.onError(error);
                         },
                         success: function(data) {
-                            data = req.makeNodeWrapper(data, "ibas");
+                            let location = new URL(url);
+                            let name = location.pathname.substring(1);
+                            name = name.substring(0, name.indexOf("/"));
+                            (name === "") && (name = (new Date()).getTime().toString());
+                            data = req.makeNodeWrapperForHttp(data, name);
                             vm.runInThisContext(data, url);
                             //Support anonymous modules.
                             context.completeLoad(moduleName);
                         },
                     };
-                    jQuery.ajax(JQryAjxSetting);
+                    jQuery.ajax(JQueryAjaxSetting);
                 } else {
                     if (exists(url)) {
                         contents = fs.readFileSync(url, 'utf8');
