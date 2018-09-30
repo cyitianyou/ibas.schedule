@@ -5,15 +5,13 @@
  * Use of this source code is governed by an Apache License, Version 2.0
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
-
-require("./polyfill");
-let requires: any = require("./requires");
+import * as requires from "./requires";
 // 最小库标记
 export const SIGN_MIN_LIBRARY: string = ".min";
 // ibas index路径
 export const URL_IBAS_INDEX: string = "ibas/index";
 /** 应用程序 */
-module.exports = class Application {
+class Application {
     // index路径
     static URL_INDEX: string = "index";
     /** 根地址 */
@@ -38,6 +36,7 @@ module.exports = class Application {
             this.ibasRoot = this.root;
         }
         let that: this = this;
+        requires.polyfill(this.root);
         requires.create("_", this.ibasRoot, this.noCache)([
             URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : "")
         ], function (): void {
@@ -55,4 +54,5 @@ module.exports = class Application {
     private diagnose(): void {
         //
     }
-};
+}
+module.exports = Application;

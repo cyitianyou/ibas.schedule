@@ -9,4 +9,5 @@ let Loader: any = require("../loader/index");
 let loader: any = new Loader();
 loader.noCache = false;
 loader.minLibrary = false;
-loader.run("https://app.avacloud.com.cn/t4v6wfh1/p02/");
+// loader.run("https://app.avacloud.com.cn/t4v6wfh1/p02/");
+loader.run("http://localhost:15386/");

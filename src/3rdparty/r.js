@@ -2574,14 +2574,20 @@ var requirejs, require, define, xpcUtil;
                             return context.onError(error);
                         },
                         success: function(data) {
-                            let location = new URL(url);
-                            let name = location.pathname.substring(1);
-                            name = name.substring(0, name.indexOf("/"));
-                            (name === "") && (name = (new Date()).getTime().toString());
-                            data = req.makeNodeWrapperForHttp(data, name);
-                            vm.runInThisContext(data, url);
-                            //Support anonymous modules.
-                            context.completeLoad(moduleName);
+                            try {
+                                let name = url.replace(document.location.href, "");
+                                if (name.startsWith("/")) {
+                                    name = name.substring(1);
+                                }
+                                name = name.substring(0, name.indexOf("/"));
+                                (name === "") && (name = (new Date()).getTime().toString());
+                                data = req.makeNodeWrapperForHttp(data, name);
+                                vm.runInThisContext(data, url);
+                                //Support anonymous modules.
+                                context.completeLoad(moduleName);
+                            } catch (e) {
+                                return context.onError(e);
+                            }
                         },
                     };
                     jQuery.ajax(JQueryAjaxSetting);
