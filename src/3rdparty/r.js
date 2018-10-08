@@ -2549,9 +2549,23 @@ var requirejs, require, define, xpcUtil;
                     '\n}(requirejsVars.require, requirejsVars.requirejs, requirejsVars.define));';
             };
             req.makeNodeWrapperForHttp = function(contents, moduleName) {
-                return '(function (require, requirejs, define) { ' +
+                return '(function (require, requirejs, define) {\n ' +
+                    //     "(function (factory) { \n \
+                    //     if (typeof module === \"object\" && typeof module.exports === \"object\") {\n \
+                    //         var v = factory(require, exports);\n \
+                    //         if (v !== undefined) module.exports = v.default;\n \
+                    //     }\n \
+                    //     else if (typeof define === \"function\" && define.amd) {\n \
+                    //         define([\"require\", \"exports\"], factory);\n \
+                    //     }\n \
+                    // })(function (require, exports) {\n \
+                    //     \"use strict\";\n " +
+                    //     //Object.defineProperty(exports, \"__esModule\", { value: true });\n" +
+
                     contents +
-                    "\nglobal." + moduleName + "=" + moduleName + ";\n" +
+                    //     "\nexports.default=" + moduleName + ";\n" +
+                    //     "});\n" +
+                    "\nglobal.window." + moduleName + " = global." + moduleName + "=" + moduleName + ";\n" +
                     '\n}(requirejsVars.require, requirejsVars.requirejs, requirejsVars.define));';
             };
 
@@ -2571,25 +2585,34 @@ var requirejs, require, define, xpcUtil;
                         async: false,
                         cache: true,
                         error: function(xhr, status, error) {
-                            return context.onError(error);
+                            console.log("require file [" + url +"] failed");
+                            context.completeLoad(moduleName);
                         },
                         success: function(data) {
+                            console.log("require file [" + url +"] sucessful");
                             try {
-                                let name = url.replace(document.location.href, "");
-                                if (name.startsWith("/")) {
-                                    name = name.substring(1);
+                                if (!url.includes("/index.js")) {
+                                    data = req.makeNodeWrapper(data);
+                                } else {
+                                    let name = url.replace(document.location.href, "");
+                                    if (name.lastIndexOf("/") > 0) {
+                                        name = name.substring(0, name.lastIndexOf("/"));
+                                    }
+                                    if (name.lastIndexOf("/") > 0) {
+                                        name = name.substring(name.lastIndexOf("/") + 1);
+                                    }
+                                    (name === "") && (name = (new Date()).getTime().toString());
+                                    data = req.makeNodeWrapperForHttp(data, name);
                                 }
-                                name = name.substring(0, name.indexOf("/"));
-                                (name === "") && (name = (new Date()).getTime().toString());
-                                data = req.makeNodeWrapperForHttp(data, name);
                                 vm.runInThisContext(data, url);
                                 //Support anonymous modules.
                                 context.completeLoad(moduleName);
                             } catch (e) {
-                                return context.onError(e);
+                                context.completeLoad(moduleName);
                             }
                         },
                     };
+                    console.log("start require file [" + url +"]");
                     jQuery.ajax(JQueryAjaxSetting);
                 } else {
                     if (exists(url)) {

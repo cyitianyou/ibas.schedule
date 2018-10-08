@@ -23,9 +23,9 @@ class Application {
     /** 使用最小库 */
     minLibrary: boolean;
     /** 名称 */
-    name: string = "schedule";
+    name: string = "shell";
     /** 运行应用 */
-    run(url: string): void {
+    run(url: string, callback: Function): void {
         if (typeof arguments[0] === "string") {
             this.root = arguments[0];
         }
@@ -38,21 +38,27 @@ class Application {
         let that: this = this;
         requires.polyfill(this.root);
         requires.create("_", this.ibasRoot, this.noCache)([
-            URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : "")
+            URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : ""),
         ], function (): void {
-            // 加载成功
-            that.show();
+            let ibas: any = (<any>global).ibas;
+            // 模块require函数
+            let require: any = ibas.requires.create({
+                context: ibas.requires.naming(that.name),
+                baseUrl: that.root + that.name,
+                waitSeconds: ibas.config.get(ibas.requires.CONFIG_ITEM_WAIT_SECONDS, 30)
+            });
+            require([
+                Application.URL_INDEX + (that.minLibrary ? SIGN_MIN_LIBRARY : "")
+            ], function (): void {
+                // 加载成功
+                callback();
+            }, function (e: Error): void {
+                callback(e);
+            });
         }, function (e: Error): void {
-            that.diagnose();
+            callback(e);
         });
-    }
-    /** 显示视图 */
-    private show(): void {
-        //
-    }
-    /** 诊断错误 */
-    private diagnose(): void {
-        //
     }
 }
 module.exports = Application;
+module.exports.requires = requires;
