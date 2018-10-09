@@ -2565,7 +2565,7 @@ var requirejs, require, define, xpcUtil;
                     contents +
                     //     "\nexports.default=" + moduleName + ";\n" +
                     //     "});\n" +
-                    "\nglobal.window." + moduleName + " = global." + moduleName + "=" + moduleName + ";\n" +
+                    "\nglobal.window." + moduleName + " = global." + moduleName + "=$.extend(" + moduleName + ",global." + moduleName + ");\n" +
                     '\n}(requirejsVars.require, requirejsVars.requirejs, requirejsVars.define));';
             };
 
@@ -2585,13 +2585,18 @@ var requirejs, require, define, xpcUtil;
                         async: false,
                         cache: true,
                         error: function(xhr, status, error) {
-                            console.log("require file [" + url +"] failed");
+                            console.log("require file [" + url + "] failed");
                             context.completeLoad(moduleName);
                         },
                         success: function(data) {
-                            console.log("require file [" + url +"] sucessful");
+                            console.log("require file [" + url + "] sucessful");
                             try {
-                                if (!url.includes("/index.js")) {
+                                if (!url.includes("/index.js") &&
+                                    !url.includes("/index.ui.c.js") &&
+                                    !url.includes("/index.ui.m.js") &&
+                                    !url.includes("/index.min.js") &&
+                                    !url.includes("/index.ui.c.min.js") &&
+                                    !url.includes("/index.ui.m.min.js")) {
                                     data = req.makeNodeWrapper(data);
                                 } else {
                                     let name = url.replace(document.location.href, "");
@@ -2612,7 +2617,7 @@ var requirejs, require, define, xpcUtil;
                             }
                         },
                     };
-                    console.log("start require file [" + url +"]");
+                    console.log("start require file [" + url + "]");
                     jQuery.ajax(JQueryAjaxSetting);
                 } else {
                     if (exists(url)) {

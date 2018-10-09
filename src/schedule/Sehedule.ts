@@ -102,7 +102,7 @@ export class Schedule {
                             ibas.i18n.add(item.id, item.description);
                         }
                     });
-                    // console.run();
+                    console.run();
                 },
                 onAllConsoleCompleted(): void {
                     that.fireInitialized();
