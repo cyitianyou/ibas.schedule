@@ -2550,22 +2550,8 @@ var requirejs, require, define, xpcUtil;
             };
             req.makeNodeWrapperForHttp = function(contents, moduleName) {
                 return '(function (require, requirejs, define) {\n ' +
-                    //     "(function (factory) { \n \
-                    //     if (typeof module === \"object\" && typeof module.exports === \"object\") {\n \
-                    //         var v = factory(require, exports);\n \
-                    //         if (v !== undefined) module.exports = v.default;\n \
-                    //     }\n \
-                    //     else if (typeof define === \"function\" && define.amd) {\n \
-                    //         define([\"require\", \"exports\"], factory);\n \
-                    //     }\n \
-                    // })(function (require, exports) {\n \
-                    //     \"use strict\";\n " +
-                    //     //Object.defineProperty(exports, \"__esModule\", { value: true });\n" +
-
                     contents +
-                    //     "\nexports.default=" + moduleName + ";\n" +
-                    //     "});\n" +
-                    "\nglobal.window." + moduleName + " = global." + moduleName + "=$.extend(" + moduleName + ",global." + moduleName + ");\n" +
+                    "\nglobal.window." + moduleName + " = global." + moduleName + "=$.extend(" + moduleName + ",global.window." + moduleName + ");\n" +
                     '\n}(requirejsVars.require, requirejsVars.requirejs, requirejsVars.define));';
             };
 
