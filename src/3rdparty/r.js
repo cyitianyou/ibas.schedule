@@ -2568,7 +2568,7 @@ var requirejs, require, define, xpcUtil;
                         url: url,
                         type: "GET",
                         contentType: "text/html; charset=utf-8",
-                        async: false,
+                        async: true,
                         cache: true,
                         error: function(xhr, status, error) {
                             console.log("require file [" + url + "] failed");
