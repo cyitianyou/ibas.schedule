@@ -6,7 +6,7 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../3rdparty/ibas.d.ts" />
-var Schedule: any = require("../schedule/Sehedule");
+import { Schedule } from "../schedule/Sehedule";
 var schedule: any = new Schedule();
 schedule.addListener(function (): void {
     ibas.servicesManager.viewShower = function (): any {

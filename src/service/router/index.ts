@@ -19,4 +19,4 @@ router.post("/services/rest/file/:method", (ctx, next) => {
 router.get("/services/rest/application.wadl", (ctx, next) => {
     ctx.body = "服务已启动，API列表建设中。。。";
 });
-module.exports = router;
+export default router;

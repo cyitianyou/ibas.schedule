@@ -9,7 +9,7 @@
 *.log
 *_log_*.txt
 .project
-*.d.ts
+/dist/
 /.vs/
 /.vscode/
 /.metadata/

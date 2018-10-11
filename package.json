@@ -4,8 +4,10 @@
     "description": "ibas定时任务,定时执行集成任务",
     "main": "index.js",
     "scripts": {
-        "build": "tsc",
-        "start": "ts-node --inspect ./src/app.ts",
+        "dev": "rm -rf ./dist && ts-node ./scripts/start-dev.ts",
+        "build": "rm -rf ./dist && ts-node ./scripts/build.ts",
+        "dev-win": "rmdir /s/q dist && ts-node ./scripts/start-dev.ts",
+        "build-win": "rmdir /s/q dist && ts-node ./scripts/build.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
@@ -23,6 +25,8 @@
         "koa-logger": "^3.2.0",
         "koa-router": "^7.4.0",
         "log4js": "^3.0.5",
+        "webpack": "^4.20.2",
+        "webpack-cli": "^3.1.2",
         "window": "^4.2.5"
     },
     "devDependencies": {
@@ -31,7 +35,13 @@
         "@types/koa-logger": "^3.1.0",
         "@types/koa-router": "^7.0.32",
         "@types/node": "^10.11.0",
+        "@types/webpack": "^4.4.16",
+        "@types/webpack-env": "^1.13.6",
+        "@types/webpack-node-externals": "^1.6.3",
+        "start-server-webpack-plugin": "^2.2.5",
+        "ts-loader": "^5.2.1",
         "ts-node": "^7.0.1",
-        "typescript": "^3.0.3"
+        "typescript": "^3.0.3",
+        "webpack-node-externals": "^1.7.2"
     }
 }

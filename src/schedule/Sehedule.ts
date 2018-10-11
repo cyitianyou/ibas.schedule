@@ -6,6 +6,7 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../3rdparty/shell.d.ts" />
+import Loader from "../loader/index";
 /** 定时器 */
 export class Schedule {
     constructor() {
@@ -17,7 +18,6 @@ export class Schedule {
     public initialize(root: string, user: string, password: string): void {
         this.status = ScheduleStatus.INITIALIZING;
         let that: this = this;
-        let Loader: any = require("../loader/index");
         let loader: any = new Loader();
         loader.noCache = false;
         loader.minLibrary = false;
@@ -147,4 +147,3 @@ export enum ScheduleStatus {
     /** 初始化完成 */
     INITIALIZED
 }
-module.exports = Schedule;

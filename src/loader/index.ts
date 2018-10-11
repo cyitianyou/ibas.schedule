@@ -60,5 +60,4 @@ class Application {
         });
     }
 }
-module.exports = Application;
-module.exports.requires = requires;
+export default Application;

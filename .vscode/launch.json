@@ -27,7 +27,7 @@
             "request": "launch",
             "name": "调试",
             "args": [
-                "${workspaceRoot}/src/app.ts" // 入口文件
+                "${workspaceRoot}/src/server.ts" // 入口文件
             ],
             "runtimeArgs": [
                 "--nolazy",
