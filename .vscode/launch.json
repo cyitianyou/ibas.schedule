@@ -25,24 +25,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "测试加载action",
-            "args": [
-                "${workspaceRoot}/src/test/actionLoadTest.ts" // 入口文件
-            ],
-            "runtimeArgs": [
-                "--nolazy",
-                "-r",
-                "ts-node/register"
-            ],
-            "sourceMaps": true,
-            "cwd": "${workspaceRoot}",
-            "protocol": "inspector",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "调试",
             "args": [
                 "${workspaceRoot}/src/app.ts" // 入口文件

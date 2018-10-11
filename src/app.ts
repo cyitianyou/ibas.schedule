@@ -8,8 +8,14 @@
 import * as Koa from "koa";
 import * as bodyParser from "koa-bodyparser";
 import * as logger from "koa-logger";
+import * as Router from "koa-router";
 let app: Koa = new Koa();
 app.use(logger());
 app.use(bodyParser());
-app.listen(3000);
+let router: Router = require("./service/router/index");
+app.use(router.routes()); // 作用：启动路由
+app.use(router.allowedMethods()); // 作用： 当请求出错时的处理逻辑
+app.listen(3000, () => {
+    console.log("starting at port 3000");
+});
 module.exports = app;
