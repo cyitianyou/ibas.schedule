@@ -41,6 +41,25 @@ class Application {
             URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : ""),
         ], function (): void {
             let ibas: any = (<any>global).ibas;
+            // #region 临时代码补丁,记得删除
+            ibas.urls.rootUrl = function (): string {
+                if (ibas.strings.isEmpty(arguments[0])) {
+                    // 未提供类型，则返回文档地址
+                    let url: string = document.location.origin + document.location.pathname;
+                    return url.substring(0, url.lastIndexOf("/"));
+                }
+                let fileName: string = arguments[0];
+                if (!fileName.startsWith("/")) { fileName = "/" + fileName; }
+                if (!fileName.endsWith(".js")) { fileName = fileName + ".js"; }
+                let fileName2: string = fileName.indexOf(ibas.SIGN_MIN_LIBRARY + ".js") > 0 ?
+                    fileName : fileName.replace(".js", ibas.SIGN_MIN_LIBRARY + ".js");
+                let root: string = window.document.location.origin;
+                let scripts: HTMLCollectionOf<HTMLScriptElement> = document.getElementsByTagName("script");
+                let url: string = ibas.urls.normalize(ibas.urls.rootUrl() + fileName);
+                root = url.substring(0, url.lastIndexOf("/"));
+                return root;
+            };
+            // #endregion
             // 模块require函数
             let require: any = ibas.requires.create({
                 context: ibas.requires.naming(that.name),

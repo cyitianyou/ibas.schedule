@@ -13,7 +13,10 @@ loader.noCache = false;
 loader.minLibrary = false;
 loader.user = "admin";
 loader.password = "1q2w3e";
-loader.run("http://localhost:15386/", function (): void {
-    let schedule: Schedule = new Schedule();
-    schedule.start();
+// loader.run("http://localhost:15386/", function (): void {
+//     let schedule: Schedule = new Schedule();
+//     schedule.start();
+// });
+loader.run("https://www.colorcoding.org/demo/", function (): void {
+    console.log("加载成功");
 });
