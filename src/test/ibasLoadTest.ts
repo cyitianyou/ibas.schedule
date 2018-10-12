@@ -17,6 +17,7 @@ loader.password = "1q2w3e";
 //     let schedule: Schedule = new Schedule();
 //     schedule.start();
 // });
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 loader.run("https://www.colorcoding.org/demo/", function (): void {
     console.log("加载成功");
 });
