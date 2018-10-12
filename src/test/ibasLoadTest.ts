@@ -6,38 +6,14 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../3rdparty/ibas.d.ts" />
+import Loader from "../loader/index";
 import { Schedule } from "../schedule/Sehedule";
-var schedule: any = new Schedule();
-schedule.addListener(function (): void {
-    ibas.servicesManager.viewShower = function (): any {
-        return {
-            /** 显示视图 */
-            show(view: ibas.IView): void {
-                //
-            },
-            /** 清理资源 */
-            destroy(view: ibas.IView): void {
-                //
-            },
-            /** 设置忙状态 */
-            busy(view: ibas.IView, busy: boolean, msg: string): void {
-                //
-            },
-            /** 进程消息 */
-            proceeding(view: ibas.IView, type: ibas.emMessageType, msg: string): void {
-                console.log(ibas.enums.describe(ibas.emMessageType, type) + ":" + msg);
-            },
-            /** 对话消息 */
-            messages(caller: ibas.IMessgesCaller): void {
-                console.log(ibas.enums.describe(ibas.emMessageType, caller.type) + ":" + caller.message);
-            },
-        };
-    };
-    (<any>global).ibas.servicesManager.runApplicationService({
-        proxy: new (<any>global).integration.app.IntegrationJobServiceProxy({
-            jobName: "HelloWorld",
-            autoRun: true,
-        }),
-    });
+let loader: Loader = new Loader();
+loader.noCache = false;
+loader.minLibrary = false;
+loader.user = "admin";
+loader.password = "1q2w3e";
+loader.run("http://localhost:15386/", function (): void {
+    let schedule: Schedule = new Schedule();
+    schedule.start();
 });
-schedule.initialize("http://localhost:15386/", "admin", "1q2w3e");

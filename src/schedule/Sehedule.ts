@@ -5,60 +5,125 @@
  * Use of this source code is governed by an Apache License, Version 2.0
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
-/// <reference path="../3rdparty/shell.d.ts" />
-import Loader from "../loader/index";
+/// <reference path="../3rdparty/integration.d.ts" />
+import TaskAction from "./TaskAction";
+import { EventEmitter } from "events";
 /** 定时器 */
-export class Schedule {
-    constructor() {
-        this.status = ScheduleStatus.UNINITIALIZED;
+export class Schedule extends EventEmitter {
+    private activated: boolean = true;
+    private jobs: ibas.ArrayList<TaskAction>;
+    public reset(): void {
+        this.emit(ScheduleEvents.RESET);
+        this.start();
     }
-    /** 状态 */
-    status: ScheduleStatus;
-    /** 初始化 */
-    public initialize(root: string, user: string, password: string): void {
-        this.status = ScheduleStatus.INITIALIZING;
+    public suspend(suspend: boolean): void {
+        if (suspend === true) {
+            this.activated = false;
+        } else {
+            this.activated = true;
+        }
+        this.emit(ScheduleEvents.SUSPEND, this.activated);
+    }
+    public start(): void {
+        this.emit(ScheduleEvents.START);
+        let criteria: ibas.ICriteria = new ibas.Criteria();
+        let condition: ibas.ICondition = criteria.conditions.create();
+        condition.alias = integration.bo.IntegrationJob.PROPERTY_ACTIVATED_NAME;
+        condition.value = ibas.emYesNo.YES.toString();
+        condition = criteria.conditions.create();
+        condition.alias = integration.bo.IntegrationJob.PROPERTY_DATAOWNER_NAME;
+        condition.value = ibas.variablesManager.getValue(ibas.VARIABLE_NAME_USER_ID);
+        condition = criteria.conditions.create();
+        condition.alias = integration.bo.IntegrationJob.PROPERTY_FREQUENCY_NAME;
+        condition.operation = ibas.emConditionOperation.GRATER_THAN;
+        condition.value = "0";
         let that: this = this;
-        let loader: any = new Loader();
-        loader.noCache = false;
-        loader.minLibrary = false;
-        loader.user = user;
-        loader.password = password;
-        loader.run(root, function (): void {
-            that.fireInitialized();
+        let boRepository: integration.bo.BORepositoryIntegration = new integration.bo.BORepositoryIntegration();
+        boRepository.fetchIntegrationJob({
+            criteria: criteria,
+            onCompleted(opRslt: ibas.IOperationResult<integration.bo.IntegrationJob>): void {
+                try {
+                    if (opRslt.resultCode !== 0) {
+                        throw new Error(opRslt.message);
+                    }
+                    let jobs: ibas.ArrayList<TaskAction> = new ibas.ArrayList<TaskAction>();
+                    let logger: ibas.ILogger = {
+                        level: ibas.config.get(ibas.CONFIG_ITEM_MESSAGES_LEVEL, ibas.emMessageLevel.INFO, ibas.emMessageLevel),
+                        log(): void {
+                            let tmpArgs: Array<any> = new Array();
+                            for (let item of arguments) {
+                                tmpArgs.push(item);
+                            }
+                            ibas.logger.log.apply(ibas.logger, tmpArgs);
+                            let message: string;
+                            let type: ibas.emMessageType = ibas.emMessageType.INFORMATION;
+                            if (typeof (tmpArgs[0]) === "number" && tmpArgs.length > 1) {
+                                type = integration.bo.DataConverter.toMessageType(tmpArgs[0]);
+                                message = ibas.strings.format(tmpArgs[1], tmpArgs.slice(2));
+                            } else if (typeof (tmpArgs[0]) === "string") {
+                                message = ibas.strings.format(tmpArgs[0], tmpArgs.slice(1));
+                            }
+                            console.log(ibas.enums.describe(ibas.emMessageType, type) + ":" + message);
+                        }
+                    };
+                    let builder: ibas.StringBuilder = new ibas.StringBuilder();
+                    builder.append("\n");
+                    builder.append("(");
+                    for (let item of opRslt.resultObjects) {
+                        if (item.integrationJobActions.length === 0) {
+                            continue;
+                        }
+                        let task: TaskAction = new TaskAction();
+                        task.job = item;
+                        task.id = task.job.toString();
+                        task.name = task.job.name;
+                        task.activated = true;
+                        task.setLogger(logger);
+                        task.onRun = function (): void {
+                            that.emit(ScheduleEvents.RUNTASK, this);
+                        };
+                        task.onDone = function (): void {
+                            that.emit(ScheduleEvents.RUNTASKCOMPLETED, this);
+                        };
+                        jobs.add(task);
+                        if (builder.length > 2) {
+                            builder.append(",");
+                        }
+                        builder.append(task.job.name);
+                    }
+                    builder.append(")");
+                    that.jobs = jobs;
+                    if (that.jobs.length > 0) {
+                        setInterval(function (): void {
+                            if (!that.activated) {
+                                return;
+                            }
+                            for (let item of that.jobs) {
+                                item.do();
+                            }
+                        }, 10000);
+                    } else {
+                        // todo: 没有任务提示
+                    }
+                    that.emit(ScheduleEvents.STARTED, that.jobs);
+                } catch (error) {
+                    // todo: 查询出错提示
+                }
+            }
         });
     }
-    /** 初始化完成，需要手工调用 */
-    protected fireInitialized(): void {
-        this.status = ScheduleStatus.INITIALIZED;
-        if (!this.listeners) {
-            return;
-        }
-        for (let listener of this.listeners) {
-            if (listener instanceof Function) {
-                listener.call(listener, this);
-            }
-        }
-        // 清除监听
-        delete (this.listeners);
-    }
-    private listeners: Array<Function>;
-    /** 添加初始化完成监听 */
-    addListener(listener: Function): void {
-        if (!this.listeners) {
-            this.listeners = new Array<Function>();
-        }
-        this.listeners.push(listener);
-    }
-    /** 运行 */
-    run(): void {
-        //
-    }
 }
-export enum ScheduleStatus {
-    /** 未初始化 */
-    UNINITIALIZED,
-    /** 正在初始化 */
-    INITIALIZING,
-    /** 初始化完成 */
-    INITIALIZED
-}
+export const ScheduleEvents: any = {
+    /** 启动 */
+    START: "start",
+    /** 启动完成 */
+    STARTED: "started",
+    /** 暂停 */
+    SUSPEND: "suspend",
+    /** 重置 */
+    RESET: "reset",
+    /** 执行任务 */
+    RUNTASK: "runTask",
+    /** 执行任务完成 */
+    RUNTASKCOMPLETED: "runTaskCompleted",
+};
