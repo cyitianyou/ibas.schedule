@@ -9,7 +9,7 @@ import * as Koa from "koa";
 import * as bodyParser from "koa-bodyparser";
 import * as logger from "koa-logger";
 import * as Router from "koa-router";
-import router from "./service/router/index";
+import router from "./router";
 let app: Koa = new Koa();
 app.use(logger());
 app.use(bodyParser());

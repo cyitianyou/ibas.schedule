@@ -5,7 +5,9 @@
  * Use of this source code is governed by an Apache License, Version 2.0
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
+/// <reference path="../index.d.ts" />
 import * as requires from "./requires";
+import ModuleConsolesLoader from "./ModuleConsolesLoader";
 // 最小库标记
 export const SIGN_MIN_LIBRARY: string = ".min";
 // ibas index路径
@@ -15,13 +17,15 @@ class Application {
     // index路径
     static URL_INDEX: string = "index";
     /** 根地址 */
-    root: string;
-    /** ibas 根地址 */
-    ibasRoot: string;
+    public root: string;
+    /** 用户 */
+    public user: string;
+    /** 密码 */
+    public password: string;
     /** 不使用缓存 */
-    noCache: boolean;
+    public noCache: boolean;
     /** 使用最小库 */
-    minLibrary: boolean;
+    public minLibrary: boolean;
     /** 名称 */
     name: string = "shell";
     /** 运行应用 */
@@ -32,12 +36,8 @@ class Application {
         if (!this.root.endsWith("/")) {
             this.root += "/";
         }
-        if (this.ibasRoot === null || this.ibasRoot === undefined) {
-            this.ibasRoot = this.root;
-        }
         let that: this = this;
-        requires.polyfill(this.root);
-        requires.create("_", this.ibasRoot, this.noCache)([
+        requires.create("_", this.root, this.noCache)([
             URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : ""),
         ], function (): void {
             let ibas: any = (<any>global).ibas;
@@ -51,12 +51,26 @@ class Application {
                 Application.URL_INDEX + (that.minLibrary ? SIGN_MIN_LIBRARY : "")
             ], function (): void {
                 // 加载成功
-                callback();
+                if (!!that.user && !!that.password) {
+                    // 已设置用户名密码,自动加载模块
+                    that.login(callback);
+                } else {
+                    callback();
+                }
             }, function (e: Error): void {
                 callback(e);
             });
         }, function (e: Error): void {
             callback(e);
+        });
+    }
+    login(callback: Function): void {
+        let config: Config = require("../config");
+        let moduleConsolesLoader: ModuleConsolesLoader = new ModuleConsolesLoader();
+        moduleConsolesLoader.login({
+            user: this.user && config.appSettings.defaultUser,
+            password: this.password && config.appSettings.defaultPassword,
+            onCompleted: <() => void>callback
         });
     }
 }
