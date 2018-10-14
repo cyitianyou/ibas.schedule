@@ -18,6 +18,10 @@ loader.password = "1q2w3e";
 //     schedule.start();
 // });
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+let stratTime: Date = new Date();
 loader.run("https://www.colorcoding.org/demo/", function (): void {
-    console.log("加载成功");
+    let endTime: Date = new Date();
+    console.log(ibas.strings.format("加载vstore花费时间{0}秒", ibas.dates.difference(ibas.dates.emDifferenceType.SECOND, endTime, stratTime)));
+    let schedule: Schedule = new Schedule();
+    schedule.start();
 });
