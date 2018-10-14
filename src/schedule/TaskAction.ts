@@ -1,5 +1,7 @@
 /// <reference path="../3rdparty/integration.d.ts" />
 /// <reference path="../3rdparty/ibas.d.ts" />
+import { Logger } from "../../node_modules/log4js/types/log4js";
+import { JOB_LOGGER_PROPERTY } from "../logger/index";
 import Action from "./Action";
 /** 任务动作 */
 export default class TaskAction extends Action {
@@ -10,11 +12,50 @@ export default class TaskAction extends Action {
     /** 激活的 */
     activated: boolean;
     /** 日志者 */
-    logger: ibas.ILogger;
+    ibasLogger: ibas.ILogger;
+    logger: Logger
     /** 设置日志记录者 */
-    setLogger(logger: ibas.ILogger): void {
-        this.logger = logger;
-        super.setLogger(this.logger);
+    setLogger(logger: ibas.ILogger): void;
+    setLogger(logger: Logger): void;
+    setLogger(): void {
+        let logger: Logger = arguments[0];
+        if (!!logger.isLevelEnabled) {
+            this.logger = logger;
+            this.ibasLogger = {
+                level: ibas.config.get(ibas.CONFIG_ITEM_MESSAGES_LEVEL, ibas.emMessageLevel.INFO, ibas.emMessageLevel),
+                log(): void {
+                    let tmpArgs: Array<any> = new Array();
+                    for (let item of arguments) {
+                        tmpArgs.push(item);
+                    }
+                    ibas.logger.log.apply(ibas.logger, tmpArgs);
+                    let message: string;
+                    let type: ibas.emMessageType = ibas.emMessageType.INFORMATION;
+                    if (typeof (tmpArgs[0]) === "number" && tmpArgs.length > 1) {
+                        type = integration.bo.DataConverter.toMessageType(tmpArgs[0]);
+                        message = ibas.strings.format(tmpArgs[1], tmpArgs.slice(2));
+                    } else if (typeof (tmpArgs[0]) === "string") {
+                        message = ibas.strings.format(tmpArgs[0], tmpArgs.slice(1));
+                    }
+                    switch (type) {
+                        case ibas.emMessageType.WARNING:
+                            logger.warn(message);
+                            break;
+                        case ibas.emMessageType.ERROR:
+                            logger.error(message);
+                            break;
+                        case ibas.emMessageType.INFORMATION:
+                        case ibas.emMessageType.SUCCESS:
+                        default:
+                            logger.info(message);
+                            break;
+                    }
+                }
+            };
+        } else {
+            this.ibasLogger = <any>logger;
+        }
+        super.setLogger(this.ibasLogger);
     }
     /** 进行 */
     do(): void {
@@ -30,6 +71,7 @@ export default class TaskAction extends Action {
         if (ibas.dates.now().getTime() < (this.lastRunTime + this.job.frequency * 1000)) {
             return;
         }
+        this.logger.addContext(JOB_LOGGER_PROPERTY, ibas.dates.toString(ibas.dates.now(), "yyyy-MM-dd-HH-mm-ss"));
         super.do();
     }
     protected done(): void {
@@ -64,7 +106,7 @@ export default class TaskAction extends Action {
                                         that.actions = new ibas.ArrayList<ibas.Action>();
                                     }
                                     // 设置日志记录
-                                    action.setLogger(that.logger);
+                                    action.setLogger(that.ibasLogger);
                                     that.actions.add(action);
                                     if (that.actions.length === opRslt.resultObjects.length) {
                                         // 全部加载完成

@@ -6,6 +6,7 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../3rdparty/integration.d.ts" />
+import { getJobLogger } from "../logger/index";
 import TaskAction from "./TaskAction";
 import { EventEmitter } from "events";
 /** 定时器 */
@@ -47,25 +48,6 @@ export class Schedule extends EventEmitter {
                         throw new Error(opRslt.message);
                     }
                     let jobs: ibas.ArrayList<TaskAction> = new ibas.ArrayList<TaskAction>();
-                    let logger: ibas.ILogger = {
-                        level: ibas.config.get(ibas.CONFIG_ITEM_MESSAGES_LEVEL, ibas.emMessageLevel.INFO, ibas.emMessageLevel),
-                        log(): void {
-                            let tmpArgs: Array<any> = new Array();
-                            for (let item of arguments) {
-                                tmpArgs.push(item);
-                            }
-                            ibas.logger.log.apply(ibas.logger, tmpArgs);
-                            let message: string;
-                            let type: ibas.emMessageType = ibas.emMessageType.INFORMATION;
-                            if (typeof (tmpArgs[0]) === "number" && tmpArgs.length > 1) {
-                                type = integration.bo.DataConverter.toMessageType(tmpArgs[0]);
-                                message = ibas.strings.format(tmpArgs[1], tmpArgs.slice(2));
-                            } else if (typeof (tmpArgs[0]) === "string") {
-                                message = ibas.strings.format(tmpArgs[0], tmpArgs.slice(1));
-                            }
-                            console.log(ibas.enums.describe(ibas.emMessageType, type) + ":" + message);
-                        }
-                    };
                     let builder: ibas.StringBuilder = new ibas.StringBuilder();
                     builder.append("\n");
                     builder.append("(");
@@ -78,7 +60,7 @@ export class Schedule extends EventEmitter {
                         task.id = task.job.toString();
                         task.name = task.job.name;
                         task.activated = true;
-                        task.setLogger(logger);
+                        task.setLogger(getJobLogger(task.id));
                         task.onRun = function (): void {
                             that.emit(ScheduleEvents.RUNTASK, this);
                         };
