@@ -13,7 +13,7 @@ export default class TaskAction extends Action {
     activated: boolean;
     /** 日志者 */
     ibasLogger: ibas.ILogger;
-    logger: Logger
+    logger: Logger;
     /** 设置日志记录者 */
     setLogger(logger: ibas.ILogger): void;
     setLogger(logger: Logger): void;
