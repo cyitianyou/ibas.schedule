@@ -71,7 +71,7 @@ export default class TaskAction extends Action {
         if (ibas.dates.now().getTime() < (this.lastRunTime + this.job.frequency * 1000)) {
             return;
         }
-        this.logger.addContext(JOB_LOGGER_PROPERTY, ibas.dates.toString(ibas.dates.now(), "yyyy-MM-dd-HH-mm-ss"));
+        this.logger.addContext(JOB_LOGGER_PROPERTY, ibas.dates.toString(ibas.dates.now(), "yyyyMMddHHmmss"));
         super.do();
     }
     protected done(): void {

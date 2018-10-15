@@ -96,6 +96,10 @@ class ModuleConsolesLoader {
                             ibas.i18n.add(item.id, item.description);
                         }
                     });
+                    // 不加载UI
+                    (<any>console).loadUI = function (): void {
+                        //
+                    };
                     console.run();
                 },
                 onAllConsoleCompleted(): void {

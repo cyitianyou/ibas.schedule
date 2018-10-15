@@ -7,6 +7,7 @@
  */
 /// <reference path="../3rdparty/ibas.d.ts" />
 import Loader from "../loader/index";
+import log4js from "../logger/index";
 import { Schedule } from "../schedule/Sehedule";
 let loader: Loader = new Loader();
 loader.noCache = false;

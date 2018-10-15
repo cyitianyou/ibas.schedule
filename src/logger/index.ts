@@ -12,26 +12,29 @@ let config: Configuration = {
         console: {
             type: "console"
         },
-        // log_file: {
-        //     type: "dateFile",
-        //     filename: "logs/date.log",
-        //     keepFileExt: true,
-        //     alwaysIncludePattern: true,
-        //     pattern: "-yyyy-MM-dd"
-        // },
-        multi: {
-            type: "multiFile",
-            base: "logs/",
-            property: "job",
-            extension: ".log"
+        runtime: {
+            type: "dateFile",
+            filename: "logs/runtime",
+            keepFileExt: true,
+            alwaysIncludePattern: true,
+            pattern: "-yyyy-MM-dd.log"
         }
     },
     categories: {
         default: { appenders: ["console"], level: "ALL" },
-        multi: { appenders: ["multi"], level: "ALL" },
+        runtime: { appenders: ["runtime", "console"], level: "ALL" }
     }
 };
-export const JOB_LOGGER_PROPERTY = "date";
+log4js.configure(config);
+let runtimeLogger: Logger = log4js.getLogger("runtime");
+// tslint:disable:no-console
+console.log = runtimeLogger.info.bind(runtimeLogger);
+console.info = runtimeLogger.info.bind(runtimeLogger);
+console.debug = runtimeLogger.debug.bind(runtimeLogger);
+console.error = runtimeLogger.error.bind(runtimeLogger);
+console.warn = runtimeLogger.warn.bind(runtimeLogger);
+console.trace = runtimeLogger.trace.bind(runtimeLogger);
+export const JOB_LOGGER_PROPERTY: string = "date";
 export function getJobLogger(job: string): Logger {
     if (!config.appenders[job]) {
         config.appenders[job] = {
@@ -40,8 +43,9 @@ export function getJobLogger(job: string): Logger {
             property: JOB_LOGGER_PROPERTY,
             extension: ".log"
         };
-        config.categories[job] = { appenders: [job, "console"], level: "ALL" };
+        config.categories[job] = { appenders: [job], level: "ALL" };
     }
     log4js.configure(config);
     return log4js.getLogger(job);
 }
+export default log4js;
