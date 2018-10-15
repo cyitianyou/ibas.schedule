@@ -95,7 +95,20 @@ export class Schedule extends EventEmitter {
         });
     }
 }
-export const ScheduleEvents: any = {
+export const ScheduleEvents: {
+    /** 启动 */
+    START: string,
+    /** 启动完成 */
+    STARTED: string,
+    /** 暂停 */
+    SUSPEND: string,
+    /** 重置 */
+    RESET: string,
+    /** 执行任务 */
+    RUNTASK: string,
+    /** 执行任务完成 */
+    RUNTASKCOMPLETED: string,
+} = {
     /** 启动 */
     START: "start",
     /** 启动完成 */

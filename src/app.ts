@@ -8,8 +8,9 @@
 import * as Koa from "koa";
 import * as bodyParser from "koa-bodyparser";
 import * as logger from "koa-logger";
-import * as Router from "koa-router";
 import router from "./router";
+import log4js from "./logger/index";
+log4js.getLogger();
 let app: Koa = new Koa();
 app.use(logger());
 app.use(bodyParser());

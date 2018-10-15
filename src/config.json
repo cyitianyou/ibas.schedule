@@ -1,9 +1,7 @@
 {
-    "serverSettings": {
-        "port": 3000,
-        "autoRun": true
-    },
     "appSettings": {
+        "port": 3000,
+        "autoRun": true,
         "url": "http://localhost:15386/",
         "defaultUser": "admin",
         "defaultPassword": "1q2w3e"

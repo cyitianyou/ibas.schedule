@@ -38,12 +38,12 @@ export function polyfill(url: string): void {
     if (!url.endsWith("/")) { url = url + "/"; }
     const windowClass: any = require("window");
     // window
-    (<any>global).window = new windowClass({ url: url });
+    global.window = new windowClass({ url: url });
     // document
-    (<any>global).document = (<any>global).window.document;
+    global.document = (<any>global).window.document;
     // require
     let requirejs: any = require("../3rdparty/r");
-    (<any>global).window.require = requirejs;
+    (<any>global.window).require = requirejs;
     // jQuery
     const $: any = require("jQuery");
     (<any>global).$ = (<any>global).jQuery = $;
