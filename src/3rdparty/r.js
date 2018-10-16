@@ -1,5 +1,5 @@
 /**
- * @license r.js 2.3.6 Tue, 16 Oct 2018 02:15:46 GMT Copyright jQuery Foundation and other contributors.
+ * @license r.js 2.3.6 Tue, 16 Oct 2018 05:01:28 GMT Copyright jQuery Foundation and other contributors.
  * Released under MIT license, http://github.com/requirejs/r.js/LICENSE
  */
 
@@ -19,7 +19,7 @@ var requirejs, require, define, xpcUtil;
 (function (console, args, readFileFunc) {
     var fileName, env, fs, vm, path, exec, rhinoContext, dir, nodeRequire,
         nodeDefine, exists, reqMain, loadedOptimizedLib, existsForNode, Cc, Ci,
-        version = '2.3.6 Tue, 16 Oct 2018 02:15:46 GMT',
+        version = '2.3.6 Tue, 16 Oct 2018 05:01:28 GMT',
         jsSuffixRegExp = /\.js$/,
         commandOption = '',
         useLibLoaded = {},
@@ -2363,32 +2363,33 @@ var requirejs, require, define, xpcUtil;
 					context.completeLoad(moduleName);
 				},
 				success: function(data) {
-					console.log("require file [" + url + "] sucessful");
-					try {
-						if (!url.includes("/index.js") &&
-							!url.includes("/index.ui.c.js") &&
-							!url.includes("/index.ui.m.js") &&
-							!url.includes("/index.min.js") &&
-							!url.includes("/index.ui.c.min.js") &&
-							!url.includes("/index.ui.m.min.js")) {
-							data = req.makeNodeWrapper(data);
-						} else {
-							let name = url.replace(document.location.href, "");
-							if (name.lastIndexOf("/") > 0) {
-								name = name.substring(0, name.lastIndexOf("/"));
+					async function asyncSuccess(data){
+						console.log("require file [" + url + "] sucessful");
+						try {
+							if (!url.includes("/index.js") &&
+								!url.includes("/index.ui.c.js") &&
+								!url.includes("/index.ui.m.js") &&
+								!url.includes("/index.min.js") &&
+								!url.includes("/index.ui.c.min.js") &&
+								!url.includes("/index.ui.m.min.js")) {
+								data = req.makeNodeWrapper(data);
+							} else {
+								let name = url.replace(document.location.href, "");
+								if (name.lastIndexOf("/") > 0) {
+									name = name.substring(0, name.lastIndexOf("/"));
+								}
+								if (name.lastIndexOf("/") > 0) {
+									name = name.substring(name.lastIndexOf("/") + 1);
+								}
+								(name === "") && (name = (new Date()).getTime().toString());
+								data = req.makeNodeWrapperForHttp(data, name);
 							}
-							if (name.lastIndexOf("/") > 0) {
-								name = name.substring(name.lastIndexOf("/") + 1);
-							}
-							(name === "") && (name = (new Date()).getTime().toString());
-							data = req.makeNodeWrapperForHttp(data, name);
+							vm.runInThisContext(data, url);
+							//Support anonymous modules.
+						} catch (e) {
 						}
-						vm.runInThisContext(data, url);
-						//Support anonymous modules.
-						context.completeLoad(moduleName);
-					} catch (e) {
-						context.completeLoad(moduleName);
 					}
+					asyncSuccess(data).then(function(){console.log("require file [" + url + "] finish");context.completeLoad(moduleName);}).catch(e => context.completeLoad(moduleName));
 				},
 			};
 			console.log("start require file [" + url + "]");
