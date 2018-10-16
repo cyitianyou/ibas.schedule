@@ -9,29 +9,41 @@
 class ModuleConsolesLoader {
     private caller: IUserConnectCaller | ITokenConnectCaller;
     /** 登录系统 */
-    public login(caller: IUserConnectCaller | ITokenConnectCaller): void {
+    public async login(caller: IUserConnectCaller | ITokenConnectCaller): Promise<void> {
+        let that: this = this;
         this.caller = caller;
-        let boRepository: shell.bo.IBORepositoryShell = shell.bo.repository.create();
-        if (!(<ITokenConnectCaller>this.caller).token) {
-            let userConnectCaller: IUserConnectCaller = <IUserConnectCaller>this.caller;
-            ibas.logger.log(ibas.emMessageLevel.DEBUG, "app: user [{0}] login system.", userConnectCaller.user);
-            boRepository.userConnect({
-                caller: this, // 设置调用者，则onCompleted修正this
-                user: userConnectCaller.user,
-                password: userConnectCaller.password,
-                onCompleted: this.onConnectCompleted,
-            });
-        } else {
-            let tokenConnectCaller: ITokenConnectCaller = <ITokenConnectCaller>this.caller;
-            ibas.logger.log(ibas.emMessageLevel.DEBUG, "app: user with token [{0}] login system.", tokenConnectCaller.token);
-            boRepository.tokenConnect({
-                caller: this, // 设置调用者，则onCompleted修正this
-                token: tokenConnectCaller.token,
-                onCompleted: this.onConnectCompleted,
-            });
-        }
+        let promise: Promise<void> = new Promise<void>(resolve => {
+            let boRepository: shell.bo.IBORepositoryShell = shell.bo.repository.create();
+            if (!(<ITokenConnectCaller>this.caller).token) {
+                let userConnectCaller: IUserConnectCaller = <IUserConnectCaller>this.caller;
+                ibas.logger.log(ibas.emMessageLevel.DEBUG, "app: user [{0}] login system.", userConnectCaller.user);
+                boRepository.userConnect({
+                    caller: this, // 设置调用者，则onCompleted修正this
+                    user: userConnectCaller.user,
+                    password: userConnectCaller.password,
+                    onCompleted: async function (opRslt: ibas.IOperationResult<shell.bo.IUser>): Promise<void> {
+                        that.onConnectCompleted(opRslt).then(function (): void {
+                            resolve();
+                        });
+                    }
+                });
+            } else {
+                let tokenConnectCaller: ITokenConnectCaller = <ITokenConnectCaller>this.caller;
+                ibas.logger.log(ibas.emMessageLevel.DEBUG, "app: user with token [{0}] login system.", tokenConnectCaller.token);
+                boRepository.tokenConnect({
+                    caller: this, // 设置调用者，则onCompleted修正this
+                    token: tokenConnectCaller.token,
+                    onCompleted: async function (opRslt: ibas.IOperationResult<shell.bo.IUser>): Promise<void> {
+                        that.onConnectCompleted(opRslt).then(function (): void {
+                            resolve();
+                        });
+                    }
+                });
+            }
+        });
+        return promise;
     }
-    private onConnectCompleted(opRslt: ibas.IOperationResult<shell.bo.IUser>): void {
+    private async onConnectCompleted(opRslt: ibas.IOperationResult<shell.bo.IUser>): Promise<void> {
         try {
             let that: this = this;
             if (ibas.objects.isNull(opRslt)) {
@@ -74,40 +86,33 @@ class ModuleConsolesLoader {
             // 加载所有模块
             let ConsoleManager: any = require("./ModuleConsoleManager");
             let consoleManager: any = new ConsoleManager();
-            consoleManager.load({
+            return consoleManager.load({
                 user: user.code,
                 platform: ibas.enums.toString(ibas.emPlantform, ibas.emPlantform.COMBINATION),
-                onError(error: Error): void {
+                async onError(error: Error): Promise<void> {
                     console.log(error);
                 },
-                onStatusMessage(type: ibas.emMessageType, message: string): void {
+                async onStatusMessage(type: ibas.emMessageType, message: string): Promise<void> {
                     console.log(message);
                 },
-                onCompleted(console: ibas.ModuleConsole): void {
+                async onCompleted(console: ibas.ModuleConsole): Promise<void> {
                     // 有效模块控制台
-                    console.addListener(function (): void {
-                        // 处理服务
-                        for (let service of console.services()) {
-                            ibas.servicesManager.register(service);
-                        }
-                        // 注册元素描述
-                        ibas.i18n.add(console.id, console.description);
-                        for (let item of console.elements()) {
-                            ibas.i18n.add(item.id, item.description);
-                        }
-                    });
+                    // console.addListener(function (): void {
+                    //     // 处理服务
+                    //     for (let service of console.services()) {
+                    //         ibas.servicesManager.register(service);
+                    //     }
+                    //     // 注册元素描述
+                    //     ibas.i18n.add(console.id, console.description);
+                    //     for (let item of console.elements()) {
+                    //         ibas.i18n.add(item.id, item.description);
+                    //     }
+                    // });
                     // 不加载UI
                     (<any>console).loadUI = function (): void {
                         //
                     };
-                    console.run();
-                },
-                onAllConsoleCompleted(): void {
-                    if (!!that.caller.caller) {
-                        that.caller.onCompleted.call(that.caller.caller);
-                    } else {
-                        that.caller.onCompleted();
-                    }
+                    // console.run();
                 }
             });
         } catch (error) {
@@ -116,20 +121,9 @@ class ModuleConsolesLoader {
     }
 }
 /**
- * 登录调用者
- */
-export interface IConnectCaller {
-    /** 调用者，若设置值，则为onCompleted方法的this */
-    caller?: any;
-    /**
-     * 调用完成
-     */
-    onCompleted(): void;
-}
-/**
  * 用户密码登录调用者
  */
-export interface IUserConnectCaller extends IConnectCaller {
+export interface IUserConnectCaller {
     /** 用户 */
     user: string;
     /** 密码 */
@@ -138,7 +132,7 @@ export interface IUserConnectCaller extends IConnectCaller {
 /**
  * 用户口令登录调用者
  */
-export interface ITokenConnectCaller extends IConnectCaller {
+export interface ITokenConnectCaller {
     /** 口令 */
     token: string;
 }
