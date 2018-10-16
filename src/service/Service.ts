@@ -5,6 +5,8 @@
  * Use of this source code is governed by an Apache License, Version 2.0
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
+
+import { emSeheduleStatus } from "../api/index";
 import { IRouterContext } from "koa-router";
 import { IDataConverter } from "./DataConverter";
 import { IOperationResult } from "./OperationResult";
@@ -21,13 +23,26 @@ export default abstract class Service {
             query: ctx.request.query,
             body: ctx.request.body,
             onComplete(opRslt: IOperationResult<any>): void {
-                if (opRslt.resultCode === 0) {
+                if (opRslt.resultCode <= 0) {
+                    // 负数和0返回前台处理
                     ctx.response.body = that.converter.convert(opRslt, method);
                 } else {
+                    // 正数服务端处理,如抛出500错误
                     ctx.throw(opRslt.resultCode, opRslt.message);
                 }
             }
         });
+    }
+    get seheduleStatus(): emSeheduleStatus {
+        if (!global.window) {
+            return emSeheduleStatus.UNINITIALIZED;
+        } else if (!global.window._sehedule) {
+            return emSeheduleStatus.INITIALIZING;
+        } else if (!global.window._sehedule.activated) {
+            return emSeheduleStatus.SUSPENDED;
+        } else {
+            return emSeheduleStatus.RUNNING;
+        }
     }
 }
 export interface IMethodCaller<P> {

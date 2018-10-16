@@ -3,10 +3,13 @@ declare namespace NodeJS {
     interface Global {
         document: Document;
         window: Window;
+        $: any;
+        jQuery: any;
     }
 }
 declare interface Window {
-    _SeheduleStatus: any;
+    require: any;
+    _sehedule: any;
 }
 interface Config {
     /** 应用设置 */

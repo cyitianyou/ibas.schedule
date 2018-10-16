@@ -11,22 +11,27 @@ import TaskAction from "./TaskAction";
 import { EventEmitter } from "events";
 /** 定时器 */
 export class Schedule extends EventEmitter {
+    public constructor() {
+        super();
+        this.setMaxListeners(0);
+        this.on(ScheduleEvents.RESET, this.reset);
+        this.on(ScheduleEvents.SUSPEND, this.suspend);
+        this.on(ScheduleEvents.START, this.start);
+    }
     private activated: boolean = true;
     private jobs: ibas.ArrayList<TaskAction>;
-    public reset(): void {
-        this.emit(ScheduleEvents.RESET);
-        this.start();
+    public async reset(): Promise<void> {
+        await this.start();
+        this.activated = true;
     }
-    public suspend(suspend: boolean): void {
+    public async suspend(suspend: boolean): Promise<void> {
         if (suspend === true) {
             this.activated = false;
         } else {
             this.activated = true;
         }
-        this.emit(ScheduleEvents.SUSPEND, this.activated);
     }
-    public start(): void {
-        this.emit(ScheduleEvents.START);
+    public async start(): Promise<void> {
         let criteria: ibas.ICriteria = new ibas.Criteria();
         let condition: ibas.ICondition = criteria.conditions.create();
         condition.alias = integration.bo.IntegrationJob.PROPERTY_ACTIVATED_NAME;
@@ -93,6 +98,11 @@ export class Schedule extends EventEmitter {
                 }
             }
         });
+    }
+    public async runTask(job: TaskAction): Promise<void> {
+        if (this.jobs.contain(job)) {
+            await job.do();
+        }
     }
 }
 export const ScheduleEvents: {

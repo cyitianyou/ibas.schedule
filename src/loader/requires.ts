@@ -5,6 +5,7 @@
  * Use of this source code is governed by an Apache License, Version 2.0
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
+import { emSeheduleStatus } from "../api/index";
 /** 运行时标记 */
 export const runtime: string = (new Date()).getTime().toString();
 /** 创建require方法 */
@@ -14,7 +15,8 @@ export function create(name: string, baseUrl: string, noCache: boolean): Functio
 /** 创建require方法 */
 export function create(): Function {
     let name: string = arguments[0], baseUrl: string = arguments[1], noCache: boolean = arguments[2];
-    if (!(<any>global).window) {
+    if (!(<any>global).window
+        || global.window.document.URL !== baseUrl) {
         this.polyfill(baseUrl);
     }
     if (noCache) {
@@ -43,9 +45,9 @@ export function polyfill(url: string): void {
     global.document = (<any>global).window.document;
     // require
     let requirejs: any = require("../3rdparty/r");
-    (<any>global.window).require = requirejs;
+    global.window.require = requirejs;
     // jQuery
     const $: any = require("jQuery");
-    (<any>global).$ = (<any>global).jQuery = $;
+    global.$ = global.jQuery = $;
 
 }
