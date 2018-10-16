@@ -152,3 +152,18 @@ export interface IUserField extends IDataDeclaration {
     /** 值 */
     Value: string;
 }
+/** 任务动作 */
+export interface ITaskAction {
+    /** 编号 */
+    ObjectKey: number;
+    /** 工作 */
+    JobName: string;
+    /** 上次运行时间 */
+    LastRunTime: number;
+    /** 激活的 */
+    Activated: boolean;
+    /** 执行中 */
+    IsRunning: boolean;
+    /** 已运行次数 */
+    RanTimes: number;
+}

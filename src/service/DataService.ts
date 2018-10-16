@@ -6,8 +6,8 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../index.d.ts" />
-import { emSeheduleStatus } from "../api/index";
-import { Schedule, ScheduleEvents } from "../schedule/Sehedule";
+import { emScheduleStatus } from "../api/index";
+import { Schedule, ScheduleEvents } from "../schedule/index";
 import Loader from "../loader/index";
 import { OperationResult, OperationInformation, OperationMessage } from "./OperationResult";
 import { DataConverter4js, IDataConverter } from "./DataConverter";
@@ -19,7 +19,7 @@ export default class DataService extends Service {
     public showStatus(caller: IMethodCaller<string>): void {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
-            opRslt.addResults(emSeheduleStatus[this.seheduleStatus]);
+            opRslt.addResults(emScheduleStatus[this.scheduleStatus]);
         } catch (e) {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
             opRslt.message = e.message;
@@ -30,7 +30,7 @@ export default class DataService extends Service {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
             let url: string = caller.query.url;
-            if (this.seheduleStatus === emSeheduleStatus.UNINITIALIZED) {
+            if (this.scheduleStatus === emScheduleStatus.UNINITIALIZED) {
                 let config: Config = require("../config");
                 let loader: Loader = new Loader();
                 loader.noCache = true;
@@ -44,7 +44,7 @@ export default class DataService extends Service {
                     console.log(ibas.strings.format("加载vstore花费时间{0}秒",
                         ibas.dates.difference(ibas.dates.emDifferenceType.SECOND, endTime, stratTime)));
                     let schedule: Schedule = new Schedule();
-                    global.window._sehedule = schedule;
+                    global.window._schedule = schedule;
                     schedule.emit(ScheduleEvents.START);
                 });
             }
@@ -57,19 +57,19 @@ export default class DataService extends Service {
     public suspend(caller: IMethodCaller<string>): void {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
-            if (this.seheduleStatus >= emSeheduleStatus.SUSPENDED) {
+            if (this.scheduleStatus >= emScheduleStatus.SUSPENDED) {
                 // 定时器已初始化
                 let state: boolean = caller.body.suspend;
                 if (!state) {
                     opRslt.resultCode = 400;
                     throw new Error("参数错误:post实体中不包含suspend属性");
                 }
-                (<Schedule>global.window._sehedule).emit(ScheduleEvents.SUSPEND, state);
+                (<Schedule>global.window._schedule).emit(ScheduleEvents.SUSPEND, state);
             } else {
                 // 定时器未初始化或正在初始化
-                if (this.seheduleStatus === emSeheduleStatus.UNINITIALIZED) {
+                if (this.scheduleStatus === emScheduleStatus.UNINITIALIZED) {
                     throw new Error("定时器未初始化,不能执行此操作.");
-                } else if (this.seheduleStatus === emSeheduleStatus.INITIALIZING) {
+                } else if (this.scheduleStatus === emScheduleStatus.INITIALIZING) {
                     throw new Error("定时器正在初始化,不能执行此操作.");
                 }
             }
@@ -82,14 +82,14 @@ export default class DataService extends Service {
     public reset(caller: IMethodCaller<string>): void {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
-            if (this.seheduleStatus >= emSeheduleStatus.SUSPENDED) {
+            if (this.scheduleStatus >= emScheduleStatus.SUSPENDED) {
                 // 定时器已初始化
-                (<Schedule>global.window._sehedule).emit(ScheduleEvents.RESET);
+                (<Schedule>global.window._schedule).emit(ScheduleEvents.RESET);
             } else {
                 // 定时器未初始化或正在初始化
-                if (this.seheduleStatus === emSeheduleStatus.UNINITIALIZED) {
+                if (this.scheduleStatus === emScheduleStatus.UNINITIALIZED) {
                     throw new Error("定时器未初始化,不能执行此操作.");
-                } else if (this.seheduleStatus === emSeheduleStatus.INITIALIZING) {
+                } else if (this.scheduleStatus === emScheduleStatus.INITIALIZING) {
                     throw new Error("定时器正在初始化,不能执行此操作.");
                 }
             }

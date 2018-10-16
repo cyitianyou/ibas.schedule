@@ -9,8 +9,9 @@ import {
     OperationResult, OperationInformation, OperationMessage
 } from "./OperationResult";
 import {
-    IOperationResult, IOperationInformation, IOperationMessage
+    IOperationResult, IOperationInformation, IOperationMessage, ITaskAction
 } from "./DataDeclaration";
+import { TaskAction } from "../schedule/index";
 /** 数据转换，ibas4Node.js */
 export class DataConverter4js implements IDataConverter {
     /**
@@ -60,6 +61,24 @@ export class DataConverter4js implements IDataConverter {
                 ResultCode: newData.resultCode,
                 Message: newData.message,
             };
+            return remote;
+        } else if (data instanceof TaskAction) {
+            let newData: TaskAction = data;
+            let remote: ITaskAction = {
+                /** 编号 */
+                ObjectKey: newData.job.objectKey,
+                /** 工作 */
+                JobName: newData.job.name,
+                /** 上次运行时间 */
+                LastRunTime: newData.lastRunTime,
+                /** 激活的 */
+                Activated: newData.activated,
+                /** 执行中 */
+                IsRunning: newData.isRunning(),
+                /** 已运行次数 */
+                RanTimes: 0,
+            };
+            let fs: any = require("fs");
             return remote;
         } else {
             return data;

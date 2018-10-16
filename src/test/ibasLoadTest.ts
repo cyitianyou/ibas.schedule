@@ -8,7 +8,7 @@
 /// <reference path="../3rdparty/ibas.d.ts" />
 import Loader from "../loader/index";
 import log4js from "../logger/index";
-import { Schedule } from "../schedule/Sehedule";
+import { Schedule } from "../schedule/Schedule";
 let loader: Loader = new Loader();
 loader.noCache = false;
 loader.minLibrary = false;
@@ -20,7 +20,7 @@ loader.password = "1q2w3e";
 // });
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 let stratTime: Date = new Date();
-loader.run("https://www.colorcoding.org/demo/", function (): void {
+loader.run("https://www.colorcoding.org/demo/").then(() => {
     let endTime: Date = new Date();
     console.log(ibas.strings.format("加载vstore花费时间{0}秒", ibas.dates.difference(ibas.dates.emDifferenceType.SECOND, endTime, stratTime)));
     let schedule: Schedule = new Schedule();

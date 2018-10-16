@@ -9,7 +9,7 @@ declare namespace NodeJS {
 }
 declare interface Window {
     require: any;
-    _sehedule: any;
+    _schedule: any;
 }
 interface Config {
     /** 应用设置 */

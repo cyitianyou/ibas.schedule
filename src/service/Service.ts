@@ -6,7 +6,7 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { emSeheduleStatus } from "../api/index";
+import { emScheduleStatus } from "../api/index";
 import { IRouterContext } from "koa-router";
 import { IDataConverter } from "./DataConverter";
 import { IOperationResult } from "./OperationResult";
@@ -33,15 +33,15 @@ export default abstract class Service {
             }
         });
     }
-    get seheduleStatus(): emSeheduleStatus {
+    get scheduleStatus(): emScheduleStatus {
         if (!global.window) {
-            return emSeheduleStatus.UNINITIALIZED;
-        } else if (!global.window._sehedule) {
-            return emSeheduleStatus.INITIALIZING;
-        } else if (!global.window._sehedule.activated) {
-            return emSeheduleStatus.SUSPENDED;
+            return emScheduleStatus.UNINITIALIZED;
+        } else if (!global.window._schedule) {
+            return emScheduleStatus.INITIALIZING;
+        } else if (!global.window._schedule.activated) {
+            return emScheduleStatus.SUSPENDED;
         } else {
-            return emSeheduleStatus.RUNNING;
+            return emScheduleStatus.RUNNING;
         }
     }
 }
