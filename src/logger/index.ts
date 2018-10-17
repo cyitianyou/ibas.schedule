@@ -6,6 +6,10 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 import { Log4js, Logger, Configuration } from "../../node_modules/log4js/types/log4js";
+let appConfig: Config = require("../config");
+if (!appConfig.appSettings.logDir.endsWith("/")) {
+    appConfig.appSettings.logDir += "/";
+}
 let log4js: Log4js = require("log4js");
 let config: Configuration = {
     appenders: {
@@ -14,7 +18,7 @@ let config: Configuration = {
         },
         runtime: {
             type: "dateFile",
-            filename: "logs/runtime",
+            filename: appConfig.appSettings.logDir + "runtime",
             keepFileExt: true,
             alwaysIncludePattern: true,
             pattern: "-yyyy-MM-dd.log"
@@ -39,7 +43,7 @@ export function getJobLogger(job: string): Logger {
     if (!config.appenders[job]) {
         config.appenders[job] = {
             type: "multiFile",
-            base: "logs/" + job,
+            base: appConfig.appSettings.logDir + job,
             property: JOB_LOGGER_PROPERTY,
             extension: ".log"
         };

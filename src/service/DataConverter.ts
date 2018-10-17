@@ -12,6 +12,7 @@ import {
     IOperationResult, IOperationInformation, IOperationMessage, ITaskAction
 } from "./DataDeclaration";
 import { TaskAction } from "../schedule/index";
+import { fs } from "../utils/index";
 /** 数据转换，ibas4Node.js */
 export class DataConverter4js implements IDataConverter {
     /**
@@ -20,16 +21,16 @@ export class DataConverter4js implements IDataConverter {
      * @param sign 特殊标记
      * @returns 目标类型
      */
-    convert(data: any, sign: string): any {
+    async convert(data: any, sign: string): Promise<any> {
         if (data instanceof OperationResult) {
             let newData: OperationResult<any> = data;
             let resultObjects: any[] = [];
             for (let item of newData.resultObjects) {
-                resultObjects.push(this.convert(item, null));
+                resultObjects.push(await this.convert(item, null));
             }
             let informations: IOperationInformation[] = [];
             for (let item of newData.informations) {
-                informations.push(this.convert(item, null));
+                informations.push(await this.convert(item, null));
             }
             let remote: IOperationResult = {
                 type: data.constructor.name,
@@ -78,7 +79,7 @@ export class DataConverter4js implements IDataConverter {
                 /** 已运行次数 */
                 RanTimes: 0,
             };
-            let fs: any = require("fs");
+            remote.RanTimes = (await fs.readdir(newData.logDir)).length;
             return remote;
         } else {
             return data;
@@ -105,12 +106,12 @@ export interface IDataConverter {
      * @param sign 特殊标记
      * @returns 目标类型
      */
-    convert(data: any, sign: string): any;
+    convert(data: any, sign: string): Promise<any>;
     /**
      * 解析业务对象数据
      * @param data 目标类型
      * @param sign 特殊标记
      * @returns 本地类型
      */
-    parsing(data: any, sign: string): any;
+    parsing(data: any, sign: string): Promise<any>;
 }

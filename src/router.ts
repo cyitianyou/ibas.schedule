@@ -11,11 +11,11 @@ let router: Router = new Router();
 router.get("/", (ctx, next) => {
     ctx.redirect("/services/rest/application.wadl");
 });
-router.post("/services/rest/data/:method", (ctx, next) => {
-    dataService.callMethod(ctx);
+router.post("/services/rest/data/:method", async (ctx, next) => {
+    await dataService.callMethod(ctx);
 });
-router.post("/services/rest/file/:method", (ctx, next) => {
-    fileService.callMethod(ctx);
+router.post("/services/rest/file/:method", async (ctx, next) => {
+    await fileService.callMethod(ctx);
 });
 router.get("/services/rest/application.wadl", (ctx, next) => {
     ctx.body = "服务已启动，API列表建设中。。。";

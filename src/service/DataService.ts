@@ -12,11 +12,11 @@ import Loader from "../loader/index";
 import { OperationResult, OperationInformation, OperationMessage } from "./OperationResult";
 import { DataConverter4js, IDataConverter } from "./DataConverter";
 import Service, { IMethodCaller } from "./Service";
-export default class DataService extends Service {
+export default class DataService extends Service implements IDataService {
     protected get converter(): IDataConverter {
         return new DataConverter4js();
     }
-    public showStatus(caller: IMethodCaller<string>): void {
+    public async showStatus(caller: IMethodCaller): Promise<OperationResult<string>> {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
             opRslt.addResults(emScheduleStatus[this.scheduleStatus]);
@@ -24,9 +24,9 @@ export default class DataService extends Service {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
             opRslt.message = e.message;
         }
-        caller.onComplete(opRslt);
+        return opRslt;
     }
-    public start(caller: IMethodCaller<string>): void {
+    public async start(caller: IMethodCaller): Promise<OperationResult<string>> {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
             let url: string = caller.query.url;
@@ -52,9 +52,9 @@ export default class DataService extends Service {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
             opRslt.message = e.message;
         }
-        caller.onComplete(opRslt);
+        return opRslt;
     }
-    public suspend(caller: IMethodCaller<string>): void {
+    public async suspend(caller: IMethodCaller): Promise<OperationResult<string>> {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
             if (this.scheduleStatus >= emScheduleStatus.SUSPENDED) {
@@ -77,9 +77,9 @@ export default class DataService extends Service {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
             opRslt.message = e.message;
         }
-        caller.onComplete(opRslt);
+        return opRslt;
     }
-    public reset(caller: IMethodCaller<string>): void {
+    public async reset(caller: IMethodCaller): Promise<OperationResult<string>> {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
             if (this.scheduleStatus >= emScheduleStatus.SUSPENDED) {
@@ -97,6 +97,12 @@ export default class DataService extends Service {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
             opRslt.message = e.message;
         }
-        caller.onComplete(opRslt);
+        return opRslt;
     }
+}
+export interface IDataService {
+    showStatus(caller: IMethodCaller): Promise<OperationResult<string>>;
+    start(caller: IMethodCaller): Promise<OperationResult<string>>;
+    suspend(caller: IMethodCaller): Promise<OperationResult<string>>;
+    reset(caller: IMethodCaller): Promise<OperationResult<string>>;
 }

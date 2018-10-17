@@ -26,4 +26,6 @@ interface AppSettings {
     defaultUser: string;
     /** 默认密码 */
     defaultPassword: string;
+    /** 日志文件夹 */
+    logDir: string;
 }

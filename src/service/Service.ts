@@ -12,26 +12,24 @@ import { IDataConverter } from "./DataConverter";
 import { IOperationResult } from "./OperationResult";
 export default abstract class Service {
     protected abstract get converter(): IDataConverter;
-    public callMethod(ctx: IRouterContext): void {
+    public async callMethod(ctx: IRouterContext): Promise<void> {
         let that: this = this;
         let method: string = ctx.params.method;
         if (!method || typeof this[method] !== "function") {
             ctx.throw(404);
             return;
         }
-        (<Function>this[method]).call(this, {
+        let opRslt: IOperationResult<any> = await (<Function>this[method]).call(this, {
             query: ctx.request.query,
-            body: ctx.request.body,
-            onComplete(opRslt: IOperationResult<any>): void {
-                if (opRslt.resultCode <= 0) {
-                    // 负数和0返回前台处理
-                    ctx.response.body = that.converter.convert(opRslt, method);
-                } else {
-                    // 正数服务端处理,如抛出500错误
-                    ctx.throw(opRslt.resultCode, opRslt.message);
-                }
-            }
+            body: ctx.request.body
         });
+        if (opRslt.resultCode <= 0) {
+            // 负数和0返回前台处理
+            ctx.response.body = await that.converter.convert(opRslt, method);
+        } else {
+            // 正数服务端处理,如抛出500错误
+            ctx.throw(opRslt.resultCode, opRslt.message);
+        }
     }
     get scheduleStatus(): emScheduleStatus {
         if (!global.window) {
@@ -45,10 +43,9 @@ export default abstract class Service {
         }
     }
 }
-export interface IMethodCaller<P> {
+export interface IMethodCaller {
     /** get参数对象 */
     query: any;
     /** post消息主体 */
     body: any;
-    onComplete(opRslt: IOperationResult<P>): void;
 }

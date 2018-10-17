@@ -57,6 +57,14 @@ export default class TaskAction extends Action {
         }
         super.setLogger(this.ibasLogger);
     }
+    /** 日志目录 */
+    get logDir(): string {
+        let appConfig: Config = require("../config");
+        if (!appConfig.appSettings.logDir.endsWith("/")) {
+            appConfig.appSettings.logDir += "/";
+        }
+        return appConfig.appSettings.logDir + this.id;
+    }
     /** 进行 */
     do(): void {
         // 未激活
