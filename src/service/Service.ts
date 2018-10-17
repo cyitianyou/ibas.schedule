@@ -9,28 +9,8 @@
 import { emScheduleStatus } from "../api/index";
 import { IRouterContext } from "koa-router";
 import { IDataConverter } from "./DataConverter";
-import { IOperationResult } from "./OperationResult";
 export default abstract class Service {
-    protected abstract get converter(): IDataConverter;
-    public async callMethod(ctx: IRouterContext): Promise<void> {
-        let that: this = this;
-        let method: string = ctx.params.method;
-        if (!method || typeof this[method] !== "function") {
-            ctx.throw(404);
-            return;
-        }
-        let opRslt: IOperationResult<any> = await (<Function>this[method]).call(this, {
-            query: ctx.request.query,
-            body: ctx.request.body
-        });
-        if (opRslt.resultCode <= 0) {
-            // 负数和0返回前台处理
-            ctx.response.body = await that.converter.convert(opRslt, method);
-        } else {
-            // 正数服务端处理,如抛出500错误
-            ctx.throw(opRslt.resultCode, opRslt.message);
-        }
-    }
+    public abstract async callMethod(ctx: IRouterContext): Promise<void>;
     get scheduleStatus(): emScheduleStatus {
         if (!global.window) {
             return emScheduleStatus.UNINITIALIZED;
@@ -40,6 +20,17 @@ export default abstract class Service {
             return emScheduleStatus.SUSPENDED;
         } else {
             return emScheduleStatus.RUNNING;
+        }
+    }
+    /** 检查定时器状态,未初始化成功不能执行某些操作 */
+    protected checkStatus(): void {
+        if (this.scheduleStatus < emScheduleStatus.SUSPENDED) {
+            // 定时器未初始化或正在初始化
+            if (this.scheduleStatus === emScheduleStatus.UNINITIALIZED) {
+                throw new Error("定时器未初始化,不能执行此操作.");
+            } else if (this.scheduleStatus === emScheduleStatus.INITIALIZING) {
+                throw new Error("定时器正在初始化,不能执行此操作.");
+            }
         }
     }
 }

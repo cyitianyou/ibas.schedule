@@ -6,4 +6,6 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 import * as fs from "./fs";
-export { fs };
+import * as path from "./path";
+import calculate from "./calculate";
+export { fs, path, calculate };

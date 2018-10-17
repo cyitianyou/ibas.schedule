@@ -6,6 +6,6 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 import DataService from "./DataService";
-import FileService from "./DataService";
+import FileService from "./FileService";
 export const dataService: DataService = new DataService();
 export const fileService: FileService = new FileService();

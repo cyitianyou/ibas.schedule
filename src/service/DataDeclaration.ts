@@ -166,4 +166,13 @@ export interface ITaskAction {
     IsRunning: boolean;
     /** 已运行次数 */
     RanTimes: number;
+    /** 运行日志 */
+    Logs: ITaskActionLog[];
+}
+/** 任务动作日志 */
+export interface ITaskActionLog {
+    /** 编号 */
+    ObjectKey: number;
+    /** 日志文件名 */
+    FileName: string;
 }

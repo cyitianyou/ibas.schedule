@@ -17,7 +17,7 @@ export function create(): Function {
     let name: string = arguments[0], baseUrl: string = arguments[1], noCache: boolean = arguments[2];
     if (!(<any>global).window
         || global.window.document.URL !== baseUrl) {
-        this.polyfill(baseUrl);
+        polyfill(baseUrl);
     }
     if (noCache) {
         // 不使用缓存

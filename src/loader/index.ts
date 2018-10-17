@@ -42,6 +42,13 @@ class Application {
                 URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : ""),
             ], function (): void {
                 let ibas: any = (<any>global).ibas;
+                if (!ibas) {
+                    // 加载出错
+                    global.window = undefined;
+                    global.document = undefined;
+                    resolve();
+                    return;
+                }
                 // #region 临时代码补丁,记得删除
                 ibas.urls.rootUrl = function (): string {
                     if (ibas.strings.isEmpty(arguments[0])) {

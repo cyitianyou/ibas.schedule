@@ -14,7 +14,7 @@ router.get("/", (ctx, next) => {
 router.post("/services/rest/data/:method", async (ctx, next) => {
     await dataService.callMethod(ctx);
 });
-router.post("/services/rest/file/:method", async (ctx, next) => {
+router.get("/services/rest/file/:method", async (ctx, next) => {
     await fileService.callMethod(ctx);
 });
 router.get("/services/rest/application.wadl", (ctx, next) => {

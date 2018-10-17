@@ -19,7 +19,7 @@ export class Schedule extends EventEmitter {
         this.on(ScheduleEvents.START, this.start);
     }
     private activated: boolean = true;
-    private jobs: ibas.ArrayList<TaskAction>;
+    public jobs: ibas.ArrayList<TaskAction>;
     public async reset(): Promise<void> {
         await this.start();
         this.activated = true;

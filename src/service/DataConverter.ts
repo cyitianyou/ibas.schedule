@@ -9,7 +9,7 @@ import {
     OperationResult, OperationInformation, OperationMessage
 } from "./OperationResult";
 import {
-    IOperationResult, IOperationInformation, IOperationMessage, ITaskAction
+    IOperationResult, IOperationInformation, IOperationMessage, ITaskAction, ITaskActionLog
 } from "./DataDeclaration";
 import { TaskAction } from "../schedule/index";
 import { fs } from "../utils/index";
@@ -78,8 +78,18 @@ export class DataConverter4js implements IDataConverter {
                 IsRunning: newData.isRunning(),
                 /** 已运行次数 */
                 RanTimes: 0,
+                Logs: new Array<ITaskActionLog>()
             };
-            remote.RanTimes = (await fs.readdir(newData.logDir)).length;
+            let files: string[] = await fs.readdir(newData.logDir);
+            for (let file of files.reverse()) {
+                remote.Logs.push({
+                    /** 编号 */
+                    ObjectKey: newData.job.objectKey,
+                    /** 日志文件名 */
+                    FileName: file
+                });
+            }
+            remote.RanTimes = files.length;
             return remote;
         } else {
             return data;

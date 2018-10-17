@@ -1,5 +1,6 @@
 /// <reference path="../3rdparty/integration.d.ts" />
 /// <reference path="../3rdparty/ibas.d.ts" />
+/// <reference path="../index.d.ts" />
 import { Logger } from "../../node_modules/log4js/types/log4js";
 import { JOB_LOGGER_PROPERTY } from "../logger/index";
 import Action from "./Action";
@@ -63,7 +64,7 @@ export default class TaskAction extends Action {
         if (!appConfig.appSettings.logDir.endsWith("/")) {
             appConfig.appSettings.logDir += "/";
         }
-        return appConfig.appSettings.logDir + this.id;
+        return appConfig.appSettings.logDir + this.id + "/";
     }
     /** 进行 */
     do(): void {
