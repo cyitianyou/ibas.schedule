@@ -153,7 +153,7 @@ export interface IUserField extends IDataDeclaration {
     Value: string;
 }
 /** 任务动作 */
-export interface ITaskAction {
+export interface ITaskAction extends IDataDeclaration {
     /** 编号 */
     ObjectKey: number;
     /** 工作 */
@@ -170,7 +170,7 @@ export interface ITaskAction {
     Logs: ITaskActionLog[];
 }
 /** 任务动作日志 */
-export interface ITaskActionLog {
+export interface ITaskActionLog extends IDataDeclaration {
     /** 编号 */
     ObjectKey: number;
     /** 日志文件名 */

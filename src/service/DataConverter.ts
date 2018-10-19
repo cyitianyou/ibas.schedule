@@ -66,6 +66,7 @@ export class DataConverter4js implements IDataConverter {
         } else if (data instanceof TaskAction) {
             let newData: TaskAction = data;
             let remote: ITaskAction = {
+                type: TaskAction.name,
                 /** 编号 */
                 ObjectKey: newData.job.objectKey,
                 /** 工作 */
@@ -83,6 +84,7 @@ export class DataConverter4js implements IDataConverter {
             let files: string[] = await fs.readdir(newData.logDir);
             for (let file of files.reverse()) {
                 remote.Logs.push({
+                    type: TaskAction.name,
                     /** 编号 */
                     ObjectKey: newData.job.objectKey,
                     /** 日志文件名 */
