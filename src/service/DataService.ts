@@ -55,7 +55,7 @@ export default class DataService extends Service implements IDataService {
                 let config: Config = require("../config");
                 let loader: Loader = new Loader();
                 loader.noCache = true;
-                loader.minLibrary = true;
+                loader.minLibrary = false;
                 loader.user = config.appSettings.defaultUser;
                 loader.password = config.appSettings.defaultPassword;
                 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -71,6 +71,9 @@ export default class DataService extends Service implements IDataService {
                     global.window._schedule = schedule;
                     schedule.emit(ScheduleEvents.START);
                 });
+                opRslt.addResults(emScheduleStatus[emScheduleStatus.INITIALIZING]);
+            } else {
+                opRslt.addResults(emScheduleStatus[this.scheduleStatus]);
             }
         } catch (e) {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
@@ -83,12 +86,12 @@ export default class DataService extends Service implements IDataService {
         try {
             this.checkStatus();
             // 定时器已初始化
-            let state: boolean = caller.body.suspend;
-            if (!state) {
-                opRslt.resultCode = 400;
-                throw new Error("参数错误:post实体中不包含suspend属性");
+            let state: boolean = true;
+            if (caller.query.suspend === "false") {
+                state = false;
             }
             (<Schedule>global.window._schedule).emit(ScheduleEvents.SUSPEND, state);
+            opRslt.addResults(emScheduleStatus[this.scheduleStatus]);
         } catch (e) {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
             opRslt.message = e.message;
@@ -100,6 +103,7 @@ export default class DataService extends Service implements IDataService {
         try {
             this.checkStatus();
             (<Schedule>global.window._schedule).emit(ScheduleEvents.RESET);
+            opRslt.addResults(emScheduleStatus[this.scheduleStatus]);
         } catch (e) {
             opRslt.resultCode = opRslt.resultCode === 0 ? -1 : opRslt.resultCode;
             opRslt.message = e.message;
