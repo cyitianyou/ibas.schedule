@@ -22,6 +22,8 @@ class Application {
     public user: string;
     /** 密码 */
     public password: string;
+    /** 用户口令 */
+    public token: string;
     /** 不使用缓存 */
     public noCache: boolean;
     /** 使用最小库 */
@@ -38,12 +40,14 @@ class Application {
             this.root += "/";
         }
         let promise: Promise<void> = new Promise<void>(resolve => {
+            let ibasIndexUrl: string = URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : "");
             requires.create("_", this.root, this.noCache)([
-                URL_IBAS_INDEX + (this.minLibrary ? SIGN_MIN_LIBRARY : ""),
+                ibasIndexUrl,
             ], function (): void {
                 let ibas: any = (<any>global).ibas;
                 if (!ibas) {
                     // 加载出错
+                    window.require.undef(ibasIndexUrl);
                     global.window = undefined;
                     global.document = undefined;
                     resolve();
@@ -95,13 +99,18 @@ class Application {
         return promise;
     }
     async login(): Promise<void> {
-        let that: this = this;
         let config: Config = require("../config");
         let moduleConsolesLoader: ModuleConsolesLoader = new ModuleConsolesLoader();
-        return moduleConsolesLoader.login({
-            user: that.user && config.appSettings.defaultUser,
-            password: that.password && config.appSettings.defaultPassword
-        });
+        if (!!this.token) {
+            return moduleConsolesLoader.login({
+                token: this.token
+            });
+        } else {
+            return moduleConsolesLoader.login({
+                user: this.user && config.appSettings.defaultUser,
+                password: this.password && config.appSettings.defaultPassword
+            });
+        }
     }
 }
 export default Application;

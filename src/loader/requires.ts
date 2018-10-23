@@ -6,8 +6,6 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../index.d.ts" />
-/** 运行时标记 */
-export const runtime: string = (new Date()).getTime().toString();
 /** 创建require方法 */
 export function create(name: string, baseUrl: string): Function;
 /** 创建require方法 */
@@ -24,14 +22,16 @@ export function create(): Function {
         return window.require.config({
             context: name,
             baseUrl: baseUrl,
+            waitSeconds: 30,
             urlArgs: function (id: string, url: string): string {
-                return (url.indexOf("?") === -1 ? "?" : "&") + "_=" + runtime;
+                return (url.indexOf("?") === -1 ? "?" : "&") + "_=" + (new Date()).getTime().toString();
             }
         });
     } else {
         return window.require.config({
             context: name,
-            baseUrl: baseUrl
+            baseUrl: baseUrl,
+            waitSeconds: 30,
         });
     }
 }
