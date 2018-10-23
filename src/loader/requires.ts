@@ -5,7 +5,7 @@
  * Use of this source code is governed by an Apache License, Version 2.0
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
-import { emScheduleStatus } from "../api/index";
+/// <reference path="../index.d.ts" />
 /** 运行时标记 */
 export const runtime: string = (new Date()).getTime().toString();
 /** 创建require方法 */
