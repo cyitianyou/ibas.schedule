@@ -6,6 +6,8 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 export enum emScheduleStatus {
+    /** 服务不可达 */
+    UNREACHABLE,
     /** 未初始化 */
     UNINITIALIZED,
     /** 正在初始化 */

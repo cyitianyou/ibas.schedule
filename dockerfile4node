@@ -1,0 +1,23 @@
+# 基于pm2官方镜像
+# OS：10-alpine
+FROM keymetrics/pm2:10-alpine
+
+# 作者
+MAINTAINER John.Chen "john.chen@avatech.com.cn"
+
+# 创建工作目录
+RUN mkdir /srv/vstore
+WORKDIR /srv/vstore
+
+# 拷贝npm依赖
+COPY node_modules node_modules/
+
+# 拷贝代码
+COPY dist src/
+COPY package.json .
+
+# 显示项目结构
+RUN ls -al
+
+# 启动服务
+CMD ["pm2-runtime", "src/server.js"]

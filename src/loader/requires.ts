@@ -47,7 +47,7 @@ export function polyfill(url: string): void {
     let requirejs: any = require("../3rdparty/r");
     global.window.require = requirejs;
     // jQuery
-    const $: any = require("jQuery");
+    const $: any = require("jquery");
     global.$ = global.jQuery = $;
 
 }

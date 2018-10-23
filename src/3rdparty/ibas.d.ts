@@ -1,5 +1,5 @@
 /// <reference path="jquery.d.ts" />
-/// <reference path="require.d.ts" />
+///// <reference path="require.d.ts" />
 /**
  * @license
  * Copyright Color-Coding Studio. All Rights Reserved.
@@ -4020,7 +4020,7 @@ declare namespace ibas {
          * 创建require实例
          * @param config 配置
          */
-        function create(requireConfig: RequireConfig): Require;
+        function create(requireConfig: any): any;
     }
 }
 /**

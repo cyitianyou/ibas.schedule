@@ -90,7 +90,7 @@ export class ModuleConsoleManager {
                             // 模块require函数
                             let minLibrary: boolean = ibas.config.get(ibas.CONFIG_ITEM_USE_MINIMUM_LIBRARY, false);
                             promises.add(new Promise<ibas.ModuleConsole>(resolve => {
-                                let require: Require = ibas.requires.create({
+                                let require: any = ibas.requires.create({
                                     context: ibas.requires.naming(module.name),
                                     baseUrl: module.address,
                                     map: {

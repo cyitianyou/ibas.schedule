@@ -4,10 +4,9 @@
     "description": "ibas定时任务,定时执行集成任务",
     "main": "index.js",
     "scripts": {
-        "dev": "rm -rf ./dist && ts-node ./scripts/start-dev.ts",
-        "build": "rm -rf ./dist && ts-node ./scripts/build.ts",
-        "dev-win": "rmdir /s/q dist && ts-node ./scripts/start-dev.ts",
+        "build": "rm -rf ./dist && npm install && tsc && cp src/config.json dist/config.json && npm prune --production",
         "build-win": "rmdir /s/q dist && ts-node ./scripts/build.ts",
+        "build-docker": "npm run build && docker build -f ./dockerfile4node -t ibas-schedule .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
@@ -38,15 +37,7 @@
         "@types/koa-router": "^7.0.32",
         "@types/koa2-cors": "^2.0.1",
         "@types/node": "^10.11.0",
-        "@types/webpack": "^4.4.16",
-        "@types/webpack-env": "^1.13.6",
-        "@types/webpack-node-externals": "^1.6.3",
-        "start-server-webpack-plugin": "^2.2.5",
-        "ts-loader": "^5.2.1",
         "ts-node": "^7.0.1",
-        "typescript": "^3.1.3",
-        "webpack": "^4.20.2",
-        "webpack-cli": "^3.1.2",
-        "webpack-node-externals": "^1.7.2"
+        "typescript": "^3.1.3"
     }
 }
