@@ -15,13 +15,13 @@ export function create(name: string, baseUrl: string, noCache: boolean): Functio
 /** 创建require方法 */
 export function create(): Function {
     let name: string = arguments[0], baseUrl: string = arguments[1], noCache: boolean = arguments[2];
-    if (!(<any>global).window
+    if (!global.window
         || global.window.document.URL !== baseUrl) {
         polyfill(baseUrl);
     }
     if (noCache) {
         // 不使用缓存
-        return (<any>window).require.config({
+        return window.require.config({
             context: name,
             baseUrl: baseUrl,
             urlArgs: function (id: string, url: string): string {
@@ -29,7 +29,7 @@ export function create(): Function {
             }
         });
     } else {
-        return (<any>window).require.config({
+        return window.require.config({
             context: name,
             baseUrl: baseUrl
         });
@@ -42,7 +42,7 @@ export function polyfill(url: string): void {
     // window
     global.window = new windowClass({ url: url });
     // document
-    global.document = (<any>global).window.document;
+    global.document = global.window.document;
     // require
     let requirejs: any = require("../3rdparty/r");
     global.window.require = requirejs;
