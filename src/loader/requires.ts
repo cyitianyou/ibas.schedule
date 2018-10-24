@@ -6,6 +6,7 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../index.d.ts" />
+import { Database } from "sqlite3";
 /** 创建require方法 */
 export function create(name: string, baseUrl: string): Function;
 /** 创建require方法 */
@@ -48,6 +49,15 @@ export function polyfill(url: string): void {
     // require不缓存requirejs
     delete require.cache[require.resolve("../3rdparty/r")];
     global.window.require = requirejs;
+    // indexedDB
+    // 解决方法缺失
+    if (typeof (<any>Array).prototype.contains === "undefined") {
+        (<any>Array).prototype.contains = (<any>Array).prototype.includes;
+    }
+    let engine: Database = new Database(":memory:");
+    const indexedDBjs: any = require("../3rdparty/indexeddb-js");
+    let scope: any = indexedDBjs.makeScope("sqlite3", engine);
+    (<any>window).indexedDB = scope.indexedDB;
     // jQuery
     const $: any = require("jquery");
     global.$ = global.jQuery = $;
