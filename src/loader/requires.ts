@@ -58,6 +58,7 @@ export function polyfill(url: string): void {
     const indexedDBjs: any = require("../3rdparty/indexeddb-js");
     let scope: any = indexedDBjs.makeScope("sqlite3", engine);
     (<any>window).indexedDB = scope.indexedDB;
+    (<any>window).indexedDB.engine = engine;
     // jQuery
     const $: any = require("jquery");
     global.$ = global.jQuery = $;
