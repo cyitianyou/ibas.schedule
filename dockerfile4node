@@ -1,6 +1,6 @@
-# 基于pm2官方镜像
-# OS：10-alpine
-FROM keymetrics/pm2:10-alpine
+# 基于node官方镜像
+# OS：10.12.0-alpine
+FROM node:10.12.0-alpine
 
 # 作者
 MAINTAINER John.Chen "john.chen@avatech.com.cn"
@@ -10,14 +10,24 @@ RUN mkdir /srv/vstore
 WORKDIR /srv/vstore
 
 # 拷贝npm依赖
-COPY node_modules node_modules/
+COPY package.json .
+COPY package-lock.json .
+RUN npm config set registry http://registry.npm.taobao.org/ && \
+    npm install pm2 -g && \
+    npm install --production && \
+    # 删除后缀名为**的无用文件
+    find . -name "*.md" -type f -print -exec rm -rf {} \; && \
+    find . -name "*.lock" -type f -print -exec rm -rf {} \; && \
+    find . -name "*.bak" -type f -print -exec rm -rf {} \; && \
+    npm cache clean -f
+
+
+# 开放端口
+EXPOSE 80 443 3000 43554 
+######################## 以上为runtime运行时######################
 
 # 拷贝代码
 COPY dist src/
-COPY package.json .
-
-# 显示项目结构
-RUN ls -al
 
 # 启动服务
 CMD ["pm2-runtime", "src/server.js"]

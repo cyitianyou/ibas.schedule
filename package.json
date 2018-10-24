@@ -4,8 +4,8 @@
     "description": "ibas定时任务,定时执行集成任务",
     "main": "index.js",
     "scripts": {
-        "build-linux": "rm -rf ./dist && npm install && tsc && cp src/config.json dist/config.json && npm prune --production",
-        "build-win": "(if exist dist rmdir /s/q dist) && npm install && tsc && copy src\\config.json dist && npm prune --production",
+        "build-linux": "rm -rf ./dist && npm install && tsc && cp src/config.json dist/config.json",
+        "build-win": "(if exist dist rmdir /s/q dist) && npm install && tsc && copy src\\config.json dist",
         "build-docker": "npm run build-linux && docker build -f ./dockerfile4node -t ibas-schedule .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
