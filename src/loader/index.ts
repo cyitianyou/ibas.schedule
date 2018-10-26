@@ -82,7 +82,7 @@ class Application {
                     Application.URL_INDEX + (that.minLibrary ? SIGN_MIN_LIBRARY : "")
                 ], async function (): Promise<void> {
                     // 加载成功
-                    if (!!that.user && !!that.password) {
+                    if ((!!that.token) || (!!that.user && !!that.password)) {
                         // 已设置用户名密码,自动加载模块
                         await that.login();
                         resolve();

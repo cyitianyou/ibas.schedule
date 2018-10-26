@@ -51,13 +51,14 @@ export default class DataService extends Service implements IDataService {
         let opRslt: OperationResult<string> = new OperationResult<string>();
         try {
             let url: string = caller.query.url;
+            let token: string = caller.query.token;
             if (this.scheduleStatus === emScheduleStatus.UNINITIALIZED) {
-                let config: Config = require("../config");
                 let loader: Loader = new Loader();
                 loader.noCache = true;
                 loader.minLibrary = false;
-                loader.user = config.appSettings.defaultUser;
-                loader.password = config.appSettings.defaultPassword;
+                if (!!token) {
+                    loader.token = token;
+                }
                 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
                 let stratTime: Date = new Date();
                 loader.run(url).then(() => {
