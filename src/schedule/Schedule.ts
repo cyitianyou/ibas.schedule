@@ -20,7 +20,13 @@ export class Schedule extends EventEmitter {
     }
     private activated: boolean = true;
     public jobs: ibas.ArrayList<TaskAction>;
+    private intervalId: NodeJS.Timeout;
     public async reset(): Promise<void> {
+        if (!!this.intervalId) {
+            // 清除定时器
+            clearInterval(this.intervalId);
+            this.intervalId = undefined;
+        }
         await this.start();
         this.activated = true;
     }
@@ -81,7 +87,7 @@ export class Schedule extends EventEmitter {
                     builder.append(")");
                     that.jobs = jobs;
                     if (that.jobs.length > 0) {
-                        setInterval(function (): void {
+                        that.intervalId = setInterval(function (): void {
                             if (!that.activated) {
                                 return;
                             }
