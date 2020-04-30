@@ -21,7 +21,7 @@
         "etag": "^1.8.1",
         "events": "^3.0.0",
         "indexeddb-js": "0.0.14",
-        "jquery": "^3.2.1",
+        "jquery": "^3.5.0",
         "koa": "^2.5.3",
         "koa-bodyparser": "^4.2.1",
         "koa-logger": "^3.2.0",
